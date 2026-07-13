@@ -28,6 +28,14 @@ export async function signIn(email:string,password:string) {
   if(result.data)storeSession(result.data); return result;
 }
 
+export async function refreshSession() {
+  const current=getStoredSession();
+  if(!current?.refresh_token||!url||!key){storeSession(null);return null;}
+  const result=await parse<AuthSession>(await fetch(`${url}/auth/v1/token?grant_type=refresh_token`,{method:'POST',headers:headers(),body:JSON.stringify({refresh_token:current.refresh_token})}));
+  if(result.data?.access_token){storeSession(result.data);return result.data;}
+  storeSession(null);return null;
+}
+
 export async function requestPasswordReset(email:string) {
   const missing=configurationError(); if(missing)return {data:null,error:missing,status:503} as ApiResult<Record<string,never>>;
   return parse(await fetch(`${url}/auth/v1/recover?redirect_to=${encodeURIComponent(`${window.location.origin}/reset-password`)}`,{method:'POST',headers:headers(),body:JSON.stringify({email})}));
@@ -52,13 +60,18 @@ export function acceptSessionFromUrl(): AuthSession | null {
 
 export async function rest<T>(path:string,init:RequestInit={}) {
   const missing=configurationError(); if(missing)return {data:null,error:missing,status:503} as ApiResult<T>;
-  const session=getStoredSession(); if(!session)return {data:null,error:"Please sign in to continue.",status:401} as ApiResult<T>;
-  return parse<T>(await fetch(`${url}/rest/v1/${path}`,{...init,headers:{...headers(session),Prefer:'return=representation',...(init.headers||{})}}));
+  let session=getStoredSession(); if(!session)return {data:null,error:"Please sign in to continue.",status:401} as ApiResult<T>;
+  const request=(active:AuthSession)=>fetch(`${url}/rest/v1/${path}`,{...init,headers:{...headers(active),Prefer:'return=representation',...(init.headers||{})}});
+  let response=await request(session);
+  if(response.status===401){const renewed=await refreshSession();if(!renewed)return {data:null,error:"Your session expired. Please sign in again.",status:401} as ApiResult<T>;session=renewed;response=await request(session);}
+  return parse<T>(response);
 }
 
 export async function uploadPrivateFile(objectPath:string,file:File) {
   const missing=configurationError(); if(missing)return {data:null,error:missing,status:503} as ApiResult<{Key:string}>;
-  const session=getStoredSession(); if(!session)return {data:null,error:"Please sign in to upload files.",status:401} as ApiResult<{Key:string}>;
-  const response=await fetch(`${url}/storage/v1/object/pgws-private/${objectPath.split('/').map(encodeURIComponent).join('/')}`,{method:'POST',headers:{apikey:key,Authorization:`Bearer ${session.access_token}`,'Content-Type':file.type||'application/octet-stream','x-upsert':'true'},body:file});
+  let session=getStoredSession(); if(!session)return {data:null,error:"Please sign in to upload files.",status:401} as ApiResult<{Key:string}>;
+  const request=(active:AuthSession)=>fetch(`${url}/storage/v1/object/pgws-private/${objectPath.split('/').map(encodeURIComponent).join('/')}`,{method:'POST',headers:{apikey:key,Authorization:`Bearer ${active.access_token}`,'Content-Type':file.type||'application/octet-stream','x-upsert':'true'},body:file});
+  let response=await request(session);
+  if(response.status===401){const renewed=await refreshSession();if(!renewed)return {data:null,error:"Your session expired. Please sign in again.",status:401} as ApiResult<{Key:string}>;session=renewed;response=await request(session);}
   return parse<{Key:string}>(response);
 }
