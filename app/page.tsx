@@ -14,11 +14,11 @@ export default function Home() {
     <SiteHeader />
     <section className="hero">
       <div className="hero-copy">
-        <p className="eyebrow">MISS PRETTY GIRLS WHO SERVE · CLASS OF 2027</p>
+        <p className="eyebrow">APPLICATIONS OPEN · MISS PRETTY GIRLS WHO SERVE 2027</p>
         <h1>The New <span>Beauty Issue</span></h1>
         <p className="hero-tagline">This Isn’t About Makeup. This Is About You.</p>
         <p className="hero-description">{content.publicCopy.coreMessage}</p>
-        <div className="hero-actions"><Link className="button button--lipstick" href="/apply">Become the next Miss PGWS</Link><a className="button button--paper" href={content.meta.urls.interestGroupMe} target="_blank" rel="noreferrer">Join the interest chat ↗</a></div>
+        <div className="hero-actions"><Link className="button button--lipstick" href="/create-account">Apply Now — Become the Next PGWS</Link><Link className="button button--paper" href="/timeline">Review competition dates</Link></div>
       </div>
       <div className="hero-art"><Image src="/brand/new-beauty-issue-cover.png" alt="Miss Pretty Girls Who Serve 2027 — The New Beauty Issue" fill priority sizes="(max-width: 1040px) 100vw, 45vw" /></div>
       <span className="hero-ruby" aria-hidden="true" />
