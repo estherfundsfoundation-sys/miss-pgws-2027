@@ -1,4 +1,18 @@
-"use client";import{useEffect,useState}from"react";import Link from"next/link";import{getStoredSession,rest,signOut}from"@/lib/supabase-browser";
-type Profile={preferred_name:string|null;legal_name:string|null;email:string|null;phone:string|null;college:string|null;email_verified:boolean;notification_preferences:{email?:boolean;sms?:boolean;calendar?:boolean};account_status:string};
-export function SettingsClient(){const session=getStoredSession();const[profile,setProfile]=useState<Profile|null>(null);const[message,setMessage]=useState('');useEffect(()=>{async function load(){if(!session)return;const r=await rest<Profile[]>(`pgws_profiles?user_id=eq.${session.user.id}&select=*&limit=1`);setProfile(r.data?.[0]??null);}load();},[session?.user.id]);if(!session)return <div className="panel"><h2>Sign in to manage your account</h2><Link className="button button--lipstick" href="/login">Sign in</Link></div>;if(!profile)return <div className="panel">Loading account settings…</div>;async function save(){const r=await rest(`pgws_profiles?user_id=eq.${session!.user.id}`,{method:'PATCH',body:JSON.stringify({preferred_name:profile!.preferred_name,phone:profile!.phone,notification_preferences:profile!.notification_preferences})});setMessage(r.error||'Settings saved.');}
-return <><div className="notice notice--success"><div><strong>{profile.email_verified?'Email verified':'Email verification pending'}</strong><br />{profile.email_verified?'Your account can complete sensitive competition actions.':'Check your inbox and spam folder. Draft work remains saved while verification is pending.'}</div></div><section className="panel"><h2>Profile & contact</h2><div className="form-grid"><div className="field"><label>Preferred name</label><input value={profile.preferred_name||''} onChange={e=>setProfile({...profile,preferred_name:e.target.value})}/></div><div className="field"><label>Phone number</label><input type="tel" value={profile.phone||''} onChange={e=>setProfile({...profile,phone:e.target.value})}/></div><div className="field"><label>Legal name</label><input value={profile.legal_name||''} disabled/><span className="field-help">After submission, legal-name corrections require staff approval.</span></div><div className="field"><label>Email</label><input value={profile.email||''} disabled/><span className="field-help">Secure email changes require reauthentication and verification.</span></div></div></section><section className="panel"><h2>Notifications</h2><div className="form-grid">{[['email','Competition email'],['sms','Text-message reminders'],['calendar','Calendar reminders']].map(([key,label])=><label className="checkbox-row" key={key}><input type="checkbox" checked={Boolean(profile.notification_preferences?.[key as 'email'])} onChange={e=>setProfile({...profile,notification_preferences:{...profile.notification_preferences,[key]:e.target.checked}})}/><span>{label}</span></label>)}</div></section><section className="panel"><h2>Security & privacy</h2><div className="hero-actions"><Link className="button button--paper" href="/forgot-password">Change password</Link><button className="button button--paper" onClick={async()=>{await signOut();window.location.href='/login';}}>Log out of this device</button><a className="button button--paper" href="mailto:nationals@estherfundsinc.org?subject=PGWS%20data%20download%20request">Request data download</a><a className="button button--ghost" href="mailto:nationals@estherfundsinc.org?subject=PGWS%20account%20deletion%20request">Request account deletion</a></div></section><div className="form-actions"><span role="status">{message}</span><button className="button button--lipstick" onClick={save}>Save settings</button></div></>}
+import { defineConfig, globalIgnores } from "eslint/config";
+import nextVitals from "eslint-config-next/core-web-vitals";
+import nextTs from "eslint-config-next/typescript";
+
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  ...nextTs,
+  // Override default ignores of eslint-config-next.
+  globalIgnores([
+    // Default ignores of eslint-config-next:
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+  ]),
+]);
+
+export default eslintConfig;

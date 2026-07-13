@@ -1,0 +1,589 @@
+{
+  "meta": {
+    "officialName": "Miss Pretty Girls Who Serve 2027",
+    "officialTheme": "The New Beauty Issue",
+    "officialTagline": "This Isn’t About Makeup. This Is About You.",
+    "applicationCallToAction": "Become the Next Miss Pretty Girls Who Serve",
+    "officialTitle": "Miss Pretty Girls Who Serve",
+    "competitionYear": 2027,
+    "operatingYear": 2026,
+    "operatingScheduleIsIntentional": true,
+    "publicDateMismatchWarning": false,
+    "contactEmail": "nationals@estherfundsinc.org",
+    "canonicalDomain": "misspgws.estherfundsfoundation.org",
+    "urls": {
+      "interestGroupMe": "https://groupme.com/join_group/115921498/tk7wjcpw",
+      "jotformVoting": "https://pci.jotform.com/form/261934135860156",
+      "jotformVotingFormId": "261934135860156",
+      "estherFundsFoundation": "https://www.estherfundsfoundation.org"
+    }
+  },
+  "signatureScripture": {
+    "reference": "Proverbs 31:10",
+    "translation": "KJV",
+    "text": "Who can find a virtuous woman? for her price is far above rubies."
+  },
+  "publicCopy": {
+    "competitionDescription": "Miss Pretty Girls Who Serve is a national, faith-centered, fundraising-based scholarship, leadership, service, advocacy, and personal-development competition for Christian college women.",
+    "strengthens": [
+      "Identity in Christ",
+      "Self-esteem",
+      "Confidence",
+      "Character",
+      "Dignity",
+      "Wisdom",
+      "Leadership",
+      "Sisterhood",
+      "Service",
+      "Purpose",
+      "Community impact",
+      "College success",
+      "College dropout prevention"
+    ],
+    "notIntendedToJudge": "The competition is not intended to judge physical appearance, body type, makeup, hair, skin tone, clothing cost, photography quality, or conformity to a single beauty standard.",
+    "navigation": [
+      "Home",
+      "The New Beauty Issue",
+      "About the Competition",
+      "Apply",
+      "Timeline",
+      "Contestant Perks",
+      "Scholarships",
+      "Meet the Contestants",
+      "Vote Now",
+      "Live Leaderboard",
+      "Competition Rounds",
+      "College Dropout Prevention",
+      "Donor Center",
+      "Donor FAQ",
+      "The Queen Archives",
+      "About Pretty Girls Who Serve",
+      "About Esther Funds Foundation",
+      "Contact",
+      "Applicant Login",
+      "Contestant Login",
+      "Admin Login"
+    ],
+    "hero": {
+      "eyebrow": "MISS PRETTY GIRLS WHO SERVE 2027",
+      "headline": "THE NEW BEAUTY ISSUE",
+      "tagline": "This Isn’t About Makeup. This Is About You.",
+      "primaryButton": "Become the Next Miss Pretty Girls Who Serve",
+      "secondaryButtons": [
+        "Explore the Experience",
+        "Review the Timeline",
+        "Meet the Contestants",
+        "Vote Now"
+      ]
+    },
+    "coreMessage": "The world has spent generations telling women what beauty should look like. The New Beauty Issue invites Christian college women to discover their identity, dignity, confidence, purpose, and worth through God.",
+    "scholarshipAndFundraisingMessage": "Miss Pretty Girls Who Serve is a fundraising-based scholarship competition. Verified voting is the primary factor in final placement and helps fund the scholarship and mission-centered programming.",
+    "collegeDropoutPrevention": {
+      "title": "Beauty With a Bigger Purpose",
+      "text": "Contestants use their voices, leadership, service, and community campaigns to advocate for college success, strengthen belonging, and help prevent college dropouts.",
+      "themes": [
+        "Scholarships",
+        "Student advocacy",
+        "Campus belonging",
+        "Leadership",
+        "College retention",
+        "Service",
+        "Community support"
+      ],
+      "button": "Learn About Esther Funds Foundation",
+      "destination": "https://www.estherfundsfoundation.org"
+    },
+    "homepageSections": [
+      "Competition overview",
+      "Contestant perks",
+      "Scholarship structure",
+      "Live countdown",
+      "Competition timeline preview",
+      "Previous queens preview",
+      "Donor information",
+      "EFF legitimacy section",
+      "Application CTA",
+      "Voting CTA",
+      "Frequently asked questions"
+    ],
+    "applicationAccountRequirement": "Applicants must create an account.",
+    "interestGroup": {
+      "availability": "Public before applying and available from the application page.",
+      "buttonLabel": "Join the Interest GroupMe",
+      "url": "https://groupme.com/join_group/115921498/tk7wjcpw",
+      "confirmationInstruction": "Immediately provide the interest group-chat link.",
+      "emailInstruction": "The interest group-chat link must also be sent by email.",
+      "notice": "The interest group chat is for general updates, reminders, and community. The website, applicant portal, official calendar, written agreement, and official emails remain the primary sources of information.",
+      "retentionRule": "Applicants should retain group-chat access regardless of selection unless removed for misconduct."
+    }
+  },
+  "calendar": {
+    "timezone": "America/New_York",
+    "publicTimezoneLabel": "ET",
+    "instruction": "Always display “ET” beside public deadlines.",
+    "dates": [
+      {
+        "id": "applications-open",
+        "label": "Applications open",
+        "display": "July 13, 2026",
+        "start": "2026-07-13T00:00:00-04:00",
+        "end": null
+      },
+      {
+        "id": "priority-deadline",
+        "label": "Priority deadline",
+        "display": "July 26, 2026 at 11:59 PM ET",
+        "start": null,
+        "end": "2026-07-26T23:59:00-04:00"
+      },
+      {
+        "id": "final-application-deadline",
+        "label": "Final application deadline",
+        "display": "August 2, 2026 at 11:59 PM ET",
+        "start": null,
+        "end": "2026-08-02T23:59:00-04:00"
+      },
+      {
+        "id": "application-review",
+        "label": "Application review",
+        "display": "July 27–August 4, 2026",
+        "start": "2026-07-27T00:00:00-04:00",
+        "end": "2026-08-04T23:59:59-04:00"
+      },
+      {
+        "id": "acceptance-notifications",
+        "label": "Acceptance notifications",
+        "display": "August 5, 2026",
+        "start": "2026-08-05T00:00:00-04:00",
+        "end": "2026-08-05T23:59:59-04:00"
+      },
+      {
+        "id": "acceptance-deadline",
+        "label": "Acceptance deadline",
+        "display": "August 7, 2026 at 6:00 PM ET",
+        "start": null,
+        "end": "2026-08-07T18:00:00-04:00"
+      },
+      {
+        "id": "waitlist-notifications",
+        "label": "Waitlist notifications",
+        "display": "August 7–8, 2026",
+        "start": "2026-08-07T00:00:00-04:00",
+        "end": "2026-08-08T23:59:59-04:00"
+      },
+      {
+        "id": "queen-training-and-official-onboarding",
+        "label": "Queen Training and Official Onboarding",
+        "display": "August 15, 2026",
+        "start": "2026-08-15T00:00:00-04:00",
+        "end": "2026-08-15T23:59:59-04:00"
+      },
+      {
+        "id": "campaign-video-due",
+        "label": "Campaign video due",
+        "display": "August 19, 2026",
+        "start": null,
+        "end": "2026-08-19T23:59:59-04:00"
+      },
+      {
+        "id": "video-review-and-corrections",
+        "label": "Video review and corrections",
+        "display": "August 20–21, 2026",
+        "start": "2026-08-20T00:00:00-04:00",
+        "end": "2026-08-21T23:59:59-04:00"
+      },
+      {
+        "id": "contestant-profiles-published",
+        "label": "Contestant profiles published",
+        "display": "August 22, 2026",
+        "start": "2026-08-22T00:00:00-04:00",
+        "end": "2026-08-22T23:59:59-04:00"
+      },
+      {
+        "id": "campaign-preparation",
+        "label": "Campaign preparation",
+        "display": "August 22–26, 2026",
+        "start": "2026-08-22T00:00:00-04:00",
+        "end": "2026-08-26T23:59:59-04:00"
+      },
+      {
+        "id": "voting-opens",
+        "label": "Voting opens",
+        "display": "August 27, 2026 at 12:00 PM ET",
+        "start": "2026-08-27T12:00:00-04:00",
+        "end": null
+      },
+      {
+        "id": "voting-closes",
+        "label": "Voting closes",
+        "display": "September 3, 2026 at 11:59 PM ET",
+        "start": null,
+        "end": "2026-09-03T23:59:00-04:00"
+      },
+      {
+        "id": "final-audit",
+        "label": "Final audit",
+        "display": "September 4, 2026",
+        "start": "2026-09-04T00:00:00-04:00",
+        "end": "2026-09-04T23:59:59-04:00"
+      },
+      {
+        "id": "virtual-crowning-and-scholarship-payment",
+        "label": "Virtual crowning and scholarship payment",
+        "display": "September 5, 2026",
+        "start": "2026-09-05T00:00:00-04:00",
+        "end": "2026-09-05T23:59:59-04:00"
+      }
+    ]
+  },
+  "eligibility": {
+    "requirements": [
+      "Be at least 18 years old",
+      "Be currently enrolled in college",
+      "Identify as a Christian",
+      "Be willing to participate in a faith-centered competition",
+      "Agree to the official competition values and rules",
+      "Be available for the required competition experience",
+      "Complete the full application",
+      "Sign the contestant agreement",
+      "Submit all required application materials"
+    ],
+    "noRequirements": [
+      "No minimum GPA",
+      "No contestant cap",
+      "No application fee"
+    ],
+    "previousWinnerRule": "Previous Miss Pretty Girls Who Serve queens or previous first-place winners may not compete again.",
+    "prettyGirlsWhoServeOfficerRule": "Pretty Girls Who Serve officers may apply.",
+    "estherFundsFoundationLeaderRule": "Esther Funds Foundation leaders may apply.",
+    "sameReviewProcessRule": "Their application must be reviewed through the same documented process.",
+    "conflictOfInterestRule": "Any applicant who has direct administrative control over scoring, votes, selections, or results must be removed from those administrative responsibilities during her participation."
+  },
+  "phases": {
+    "publicSchedule": [
+      {
+        "title": "Applications",
+        "dateIds": [
+          "applications-open",
+          "priority-deadline",
+          "final-application-deadline"
+        ]
+      },
+      {
+        "title": "Application Review and Selection",
+        "dateIds": [
+          "application-review",
+          "acceptance-notifications",
+          "acceptance-deadline",
+          "waitlist-notifications"
+        ]
+      },
+      {
+        "title": "Queen Training and Official Onboarding",
+        "dateIds": [
+          "queen-training-and-official-onboarding"
+        ]
+      },
+      {
+        "title": "Campaign Video",
+        "dateIds": [
+          "campaign-video-due",
+          "video-review-and-corrections"
+        ]
+      },
+      {
+        "title": "Contestant Profiles and Campaign Preparation",
+        "dateIds": [
+          "contestant-profiles-published",
+          "campaign-preparation"
+        ]
+      },
+      {
+        "title": "Voting",
+        "dateIds": [
+          "voting-opens",
+          "voting-closes"
+        ]
+      },
+      {
+        "title": "Final Audit and Crowning",
+        "dateIds": [
+          "final-audit",
+          "virtual-crowning-and-scholarship-payment"
+        ]
+      }
+    ],
+    "roundTemplates": [
+      "Application Round",
+      "Campaign Video Round",
+      "Queen Training Round",
+      "Service and Advocacy Round",
+      "Preliminary Voting Round",
+      "Final Voting Round",
+      "Final Audit",
+      "Crowning"
+    ],
+    "roundStatuses": [
+      "Draft",
+      "Scheduled",
+      "Open",
+      "Paused",
+      "Closed",
+      "Under Audit",
+      "Finalized",
+      "Archived"
+    ]
+  },
+  "application": {
+    "statuses": [
+      "Draft",
+      "Incomplete",
+      "Submitted",
+      "Under Review",
+      "Second Review",
+      "Interview Requested",
+      "Accepted",
+      "Waitlisted",
+      "Declined",
+      "Withdrawn"
+    ],
+    "autosave": {
+      "enabled": true,
+      "instruction": "Save application progress automatically.",
+      "returnLater": "Allow applicants to leave and return."
+    },
+    "progressDisplay": [
+      "Percentage complete",
+      "Missing required items",
+      "Contract status",
+      "Upload status",
+      "Submission deadline",
+      "Application status"
+    ],
+    "sections": [
+      {
+        "id": "meet-the-applicant",
+        "title": "Meet the Applicant",
+        "questions": [
+          { "key": "legal_first_name", "label": "Full legal first name", "type": "text", "required": null },
+          { "key": "legal_last_name", "label": "Full legal last name", "type": "text", "required": null },
+          { "key": "preferred_display_name", "label": "Preferred display name", "type": "text", "required": null },
+          { "key": "date_of_birth", "label": "Date of birth", "type": "date", "required": null },
+          { "key": "personal_email", "label": "Personal email", "type": "email", "required": null },
+          { "key": "college_email", "label": "College email", "type": "email", "required": null },
+          { "key": "phone_number", "label": "Phone number", "type": "tel", "required": null },
+          { "key": "mailing_address", "label": "Mailing address", "type": "address", "required": null },
+          { "key": "hometown", "label": "Hometown", "type": "text", "required": null },
+          { "key": "college_or_university", "label": "College or university", "type": "text", "required": null },
+          { "key": "college_city_state", "label": "City and state of college", "type": "text", "required": null },
+          { "key": "major", "label": "Major", "type": "text", "required": null },
+          { "key": "classification", "label": "Classification", "type": "select", "required": null, "options": null },
+          { "key": "graduation_year", "label": "Graduation year", "type": "number", "required": null },
+          { "key": "social_media_handles", "label": "Social-media handles", "type": "repeatable-text", "required": null },
+          { "key": "emergency_contact", "label": "Emergency contact", "type": "contact", "required": null },
+          { "key": "name_pronunciation", "label": "Name pronunciation", "type": "text", "required": null }
+        ],
+        "validation": "Validate that the applicant is at least 18."
+      },
+      {
+        "id": "eligibility",
+        "title": "Eligibility",
+        "questions": [
+          { "key": "confirm_age", "label": "I am at least 18 years old.", "type": "checkbox", "required": true },
+          { "key": "confirm_college_enrollment", "label": "I am currently enrolled in college.", "type": "checkbox", "required": true },
+          { "key": "confirm_christian_identity", "label": "I identify as Christian.", "type": "checkbox", "required": true },
+          { "key": "confirm_faith_centered", "label": "I understand this is a faith-centered competition.", "type": "checkbox", "required": true },
+          { "key": "confirm_public_participation", "label": "I can participate respectfully in a public scholarship competition.", "type": "checkbox", "required": true },
+          { "key": "confirm_no_selection_guarantee", "label": "I understand there is no guarantee of selection.", "type": "checkbox", "required": true },
+          { "key": "confirm_fundraising_based", "label": "I understand this is a fundraising-based competition.", "type": "checkbox", "required": true },
+          { "key": "confirm_voting_primary", "label": "I understand voting is the primary factor in final placement.", "type": "checkbox", "required": true },
+          { "key": "confirm_votes_are_donations", "label": "I understand all votes are donations.", "type": "checkbox", "required": true },
+          { "key": "confirm_official_voting_channels", "label": "I agree to use only official voting channels.", "type": "checkbox", "required": true },
+          { "key": "confirm_queen_training", "label": "I can attend the required Queen Training unless an exception is formally approved.", "type": "checkbox", "required": true }
+        ]
+      },
+      {
+        "id": "your-story",
+        "title": "Your Story",
+        "intro": "Include thoughtful application questions such as:",
+        "questions": [
+          { "key": "why_become_miss_pgws", "label": "Why do you want to become Miss Pretty Girls Who Serve?", "type": "long-text", "required": null, "wordLimit": null },
+          { "key": "what_makes_you_stand_out", "label": "What makes you stand out as an applicant?", "type": "long-text", "required": null, "wordLimit": null },
+          { "key": "tagline_meaning", "label": "What does “This Isn’t About Makeup. This Is About You.” mean to you?", "type": "long-text", "required": null, "wordLimit": null },
+          { "key": "worldly_message_unlearned", "label": "What worldly message about beauty or worth have you had to unlearn?", "type": "long-text", "required": null, "wordLimit": null },
+          { "key": "faith_and_self_image", "label": "How has your Christian faith shaped the way you see yourself?", "type": "long-text", "required": null, "wordLimit": null },
+          { "key": "what_god_says_about_daughters", "label": "What do you believe God says about His daughters?", "type": "long-text", "required": null, "wordLimit": null },
+          { "key": "confidence_struggle", "label": "Describe a time you struggled with confidence, self-esteem, comparison, or validation.", "type": "long-text", "required": null, "wordLimit": null },
+          { "key": "confidence_lesson", "label": "What did that experience teach you?", "type": "long-text", "required": null, "wordLimit": null },
+          { "key": "true_beauty", "label": "What does true beauty mean to you?", "type": "long-text", "required": null, "wordLimit": null },
+          { "key": "demonstrate_values", "label": "How do you demonstrate faith, character, dignity, wisdom, and service?", "type": "long-text", "required": null, "wordLimit": null },
+          { "key": "encourage_self_worth", "label": "How would you encourage another young woman struggling with self-worth?", "type": "long-text", "required": null, "wordLimit": null },
+          { "key": "why_represent_pgws", "label": "Why should you represent Pretty Girls Who Serve?", "type": "long-text", "required": null, "wordLimit": null }
+        ],
+        "wordLimitInstruction": "Add configurable word limits."
+      },
+      {
+        "id": "leadership-service-and-advocacy",
+        "title": "Leadership, Service and Advocacy",
+        "questions": [
+          { "key": "leadership_experience", "label": "Leadership experience", "type": "long-text", "required": null },
+          { "key": "community_service_experience", "label": "Community-service experience", "type": "long-text", "required": null },
+          { "key": "church_involvement", "label": "Church involvement", "type": "long-text", "required": null },
+          { "key": "campus_involvement", "label": "Campus involvement", "type": "long-text", "required": null },
+          { "key": "awards_and_honors", "label": "Awards and honors", "type": "long-text", "required": null },
+          { "key": "personal_platform", "label": "Personal platform", "type": "long-text", "required": null },
+          { "key": "issue_affecting_girls_or_women", "label": "Issue affecting girls or women that matters to her", "type": "long-text", "required": null },
+          { "key": "proposed_service_initiative", "label": "Proposed service initiative", "type": "long-text", "required": null },
+          { "key": "platform_and_college_success", "label": "How her platform connects to college success", "type": "long-text", "required": null },
+          { "key": "platform_and_dropout_prevention", "label": "How her platform connects to college dropout prevention", "type": "long-text", "required": null },
+          { "key": "title_use", "label": "How she would use the title", "type": "long-text", "required": null },
+          { "key": "future_goals", "label": "Future goals", "type": "long-text", "required": null },
+          { "key": "advice_to_young_women", "label": "Advice to other young women", "type": "long-text", "required": null }
+        ]
+      },
+      {
+        "id": "public-profile-materials",
+        "title": "Public Profile Materials",
+        "intro": "All materials required for the contestant profile must be submitted during the application period.",
+        "questions": [
+          { "key": "headshot", "label": "High-quality headshot", "type": "file", "required": true },
+          { "key": "second_photo", "label": "Optional second photo", "type": "file", "required": false },
+          { "key": "public_biography", "label": "Short public biography", "type": "long-text", "required": true },
+          { "key": "favorite_scripture", "label": "Favorite scripture", "type": "text", "required": true },
+          { "key": "personal_definition_of_beauty", "label": "Personal definition of beauty", "type": "long-text", "required": true },
+          { "key": "faith_statement", "label": "Faith statement", "type": "long-text", "required": true },
+          { "key": "profile_personal_platform", "label": "Personal platform", "type": "long-text", "required": true },
+          { "key": "leadership_summary", "label": "Leadership summary", "type": "long-text", "required": true },
+          { "key": "service_summary", "label": "Service summary", "type": "long-text", "required": true },
+          { "key": "future_career_goal", "label": "Future career goal", "type": "long-text", "required": true },
+          { "key": "personal_quote", "label": "Personal quote", "type": "long-text", "required": true },
+          { "key": "profile_advice_to_young_women", "label": "Advice to young women", "type": "long-text", "required": true },
+          { "key": "fun_facts", "label": "Fun facts", "type": "long-text", "required": true },
+          { "key": "profile_social_media_links", "label": "Social-media links", "type": "repeatable-url", "required": true },
+          { "key": "profile_pronunciation_guide", "label": "Pronunciation guide", "type": "text", "required": true },
+          { "key": "permission_to_publish", "label": "Permission to publish selected materials if accepted", "type": "checkbox", "required": true }
+        ],
+        "photoNotice": "Make clear that applicants do not need to pay for professional photography.",
+        "photoReviewRule": "The application must not judge applicants on photo quality beyond basic usability and appropriateness."
+      },
+      {
+        "id": "contestant-agreement",
+        "title": "Contestant Agreement",
+        "intro": "Embed the complete contestant agreement inside the application.",
+        "questions": [
+          {
+            "key": "contestant_agreement",
+            "label": "Complete and sign the contestant agreement",
+            "type": "agreement",
+            "required": true
+          }
+        ],
+        "applicantActions": [
+          "Open the agreement",
+          "Scroll through the agreement",
+          "Initial key sections",
+          "Complete required acknowledgments",
+          "Type her legal name",
+          "Sign electronically",
+          "Date the agreement",
+          "Receive a PDF copy",
+          "Download the PDF from her portal"
+        ],
+        "notice": "Signing this agreement does not guarantee acceptance. If the applicant is selected and accepts her contestant position, the agreement governs her participation.",
+        "requiredInitialTopics": [
+          "Eligibility",
+          "Faith-centered expectations",
+          "Mandatory training",
+          "Voting structure",
+          "Live leaderboard",
+          "Nonrefundable donations",
+          "Donor privacy",
+          "Points system",
+          "Campaign-video requirement",
+          "Conduct",
+          "Social-media expectations",
+          "Scholarship calculation",
+          "Winner responsibilities",
+          "Same-day Zelle payment process",
+          "Portal as official source of truth",
+          "Withdrawal policy",
+          "Disqualification",
+          "Media release"
+        ]
+      },
+      {
+        "id": "final-review",
+        "title": "Final Review",
+        "questions": [
+          { "key": "application_completeness", "label": "Application completeness", "type": "review-status", "required": null },
+          { "key": "upload_completeness", "label": "Upload completeness", "type": "review-status", "required": null },
+          { "key": "contract_signature_status", "label": "Contract signature status", "type": "review-status", "required": null },
+          { "key": "calendar_acknowledgment", "label": "Calendar acknowledgment", "type": "checkbox", "required": null },
+          { "key": "eligibility_acknowledgment", "label": "Eligibility acknowledgment", "type": "checkbox", "required": null },
+          { "key": "marketing_consent_preference", "label": "Marketing-consent preference", "type": "consent", "required": null },
+          { "key": "competition_email_consent", "label": "Competition-email consent", "type": "consent", "required": null }
+        ],
+        "primarySubmitButton": "Submit My Application",
+        "alternateSubmitButton": "Submit My Story"
+      }
+    ],
+    "confirmation": {
+      "headline": "Your Application Has Been Submitted",
+      "displayItems": [
+        "Applicant name",
+        "Application number",
+        "Date submitted",
+        "Application status",
+        "Agreement signed",
+        "Signed agreement download",
+        "Expected notification date",
+        "Official calendar",
+        "Contact support",
+        "Join interest group chat"
+      ],
+      "interestGroupNotice": "The interest group chat is for general updates, reminders, and community. The website, applicant portal, official calendar, written agreement, and official emails remain the primary sources of information."
+    }
+  },
+  "voting": {
+    "jotformUrl": "https://pci.jotform.com/form/261934135860156",
+    "jotformFormId": "261934135860156",
+    "pricePerVoteUsd": 2.5,
+    "priceDisplay": "$2.50 per vote",
+    "verifiedVotingWeightPercent": 85,
+    "performanceWeightPercent": 15,
+    "primaryFactorCopy": "Voting is the primary factor in final placement.",
+    "verificationRule": "Only count payments that are successfully completed and verified.",
+    "voteCalculation": "Verified amount ÷ $2.50 = verified votes",
+    "donorLanguage": "Each verified vote is a $2.50 donation supporting the Miss Pretty Girls Who Serve scholarship competition and mission-centered programming. Donations do not belong to contestants personally."
+  },
+  "prizes": [
+    {
+      "place": 1,
+      "title": "Miss Pretty Girls Who Serve",
+      "scholarshipFormula": "10% of total verified competition voting donations",
+      "guaranteedMinimumUsd": 1000,
+      "maximumUsd": null,
+      "maximumPublicationStatus": "Do not publish a maximum until the user enters and approves it."
+    },
+    {
+      "place": 2,
+      "title": "Miss Pretty Girls University",
+      "scholarshipFormula": null,
+      "scholarshipAmountUsd": null,
+      "publicationStatus": "Do not invent or publish an amount until approved."
+    },
+    {
+      "place": 3,
+      "title": null,
+      "optional": true,
+      "enabled": false,
+      "scholarshipFormula": null,
+      "scholarshipAmountUsd": null,
+      "benefits": null,
+      "winnerDuties": null,
+      "announcementDate": null,
+      "publicationStatus": "Do not display third place publicly until enabled by admin.",
+      "announcementRule": "Third place must be announced before voting begins if it will be awarded."
+    }
+  ]
+}

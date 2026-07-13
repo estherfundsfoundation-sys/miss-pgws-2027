@@ -1,1 +1,7 @@
-import type{Metadata}from"next";import Link from"next/link";import{DashboardHeader}from"../components/DashboardHeader";import{SettingsClient}from"./SettingsClient";export const metadata:Metadata={title:'Account Settings'};export default function Page(){return <main className="dashboard-shell"><DashboardHeader/><div className="dashboard-grid"><aside className="dashboard-nav"><p className="eyebrow eyebrow--light">ACCOUNT</p><nav><Link href="/portal">Overview</Link><Link aria-current="page" href="/settings">Profile & settings</Link><Link href="/forgot-password">Password</Link><Link href="/help-signing-in">Support</Link></nav></aside><section className="dashboard-main"><p className="eyebrow">YOUR ACCOUNT</p><h1>Settings & security.</h1><p className="lede">Keep your contact information, reminders, privacy choices, and account security current.</p><SettingsClient/></section></div></main>}
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  out: "./drizzle",
+  schema: "./db/schema.ts",
+  dialect: "sqlite",
+});
