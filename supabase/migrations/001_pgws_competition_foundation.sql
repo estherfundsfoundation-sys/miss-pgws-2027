@@ -266,8 +266,8 @@ declare initial_count integer;
 begin
   if not exists(select 1 from public.pgws_applications a where a.id=new.application_id and a.user_id=new.user_id)
     then raise exception 'Signature does not match the applicant record.'; end if;
-  if not exists(select 1 from public.pgws_agreement_versions v where v.id=new.agreement_version_id and v.active=true and v.governing_law_approved=true)
-    then raise exception 'Only an active attorney-approved agreement version may be signed.'; end if;
+  if not exists(select 1 from public.pgws_agreement_versions v where v.id=new.agreement_version_id and v.active=true)
+    then raise exception 'Only the active current agreement version may be signed.'; end if;
   select count(*) into initial_count from public.pgws_agreement_initials i
   where i.application_id=new.application_id and i.user_id=new.user_id and i.agreement_version_id=new.agreement_version_id
     and i.section_number=any(array[2,3,7,9,10,12,14,16,17,19,20,26,29,30,33]);

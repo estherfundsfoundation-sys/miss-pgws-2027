@@ -1,1 +1,11 @@
-import{AdminFrame}from"../AdminFrame";export default function Page(){return <AdminFrame current="/admin/settings" title="Competition configuration." intro="Control dates, rounds, agreement versions, scholarship disclosures, leaderboard display, and public publishing from one governed workspace."><div className="notice"><span>◆</span><div><strong>Required before applications can be finalized:</strong><br/>Enter the agreement version and effective date, obtain attorney-approved Section 41 language, publish the maximum first-place scholarship amount, confirm processing-fee treatment, and approve the second-place scholarship amount.</div></div></AdminFrame>}
+import { AdminFrame } from "../AdminFrame";
+import { PlatformLaunchManager } from "./PlatformLaunchManager";
+import { StaffAccessManager } from "./StaffAccessManager";
+
+export default function Page() {
+  return <AdminFrame current="/admin/settings" title="Competition configuration." intro="Control staff access, dates, rounds, agreement versions, scholarship disclosures, leaderboard display, and public publishing from one governed workspace.">
+    <PlatformLaunchManager />
+    <div className="notice settings-readiness"><span>◆</span><div><strong>External legal review remains recommended.</strong><br />This internal advisory is nonblocking. A super administrator may open real applications now, and that decision is written to the audit log.</div></div>
+    <StaffAccessManager />
+  </AdminFrame>;
+}

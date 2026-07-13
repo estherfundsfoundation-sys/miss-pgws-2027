@@ -1,0 +1,40 @@
+{
+  "competition": {
+    "name": "Miss Pretty Girls Who Serve 2027",
+    "theme": "The New Beauty Issue",
+    "contactEmail": "nationals@estherfundsinc.org",
+    "votingUrl": "https://pci.jotform.com/form/261934135860156"
+  },
+  "prettyGirlsWhoServe": {
+    "name": "Pretty Girls Who Serve",
+    "website": "https://linktr.ee/prettygirlswhoserve",
+    "instagramHandle": "@prettygirlswhoserve",
+    "instagramUrl": "https://www.instagram.com/prettygirlswhoserve/",
+    "logo": "/brand/pgws-logo.png"
+  },
+  "estherFundsFoundation": {
+    "name": "Esther Funds Foundation",
+    "website": "https://www.estherfundsfoundation.org",
+    "instagramHandle": "@estherfundsfoundation",
+    "instagramUrl": "https://www.instagram.com/estherfundsfoundation/",
+    "designation": "Faith-Based 501(c)(3) Nonprofit Organization",
+    "ein": "93-4917509",
+    "logo": "/brand/eff-logo.png"
+  },
+  "queens": [
+    {
+      "name": "Mikayla Ware",
+      "title": "Miss Pretty Girls Who Serve 2026",
+      "image": "/queens/mikayla-ware-orange-portrait.jpeg",
+      "featureImage": "/queens/mikayla-ware-orange-wide.jpeg",
+      "highlight": "Established the very first Pretty Girls Who Serve collegiate chapter at Delaware State University, expanding the organization's impact and sisterhood on campus."
+    },
+    {
+      "name": "Faith Anderson",
+      "title": "Miss Pretty Girls University 2026",
+      "image": "/queens/faith-anderson-sash-front.jpeg",
+      "featureImage": "/queens/faith-anderson-sash-side.jpeg",
+      "highlight": "Hosted the first Pretty Girls Who Serve Brunch during her reign, creating a meaningful space for sisterhood, encouragement, and community."
+    }
+  ]
+}

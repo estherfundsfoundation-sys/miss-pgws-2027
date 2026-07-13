@@ -246,13 +246,13 @@
     {
       "number": 26,
       "heading": "SCHOLARSHIP STRUCTURE",
-      "bodyMarkdown": "## First Place\n\nThe first-place title is:\n\n**Miss Pretty Girls Who Serve**\n\nThe intended first-place scholarship equals 10% of total verified competition voting donations.\n\nThe first-place scholarship has a guaranteed minimum of $1,000 once the Competition officially proceeds.\n\nThe maximum scholarship amount will be published before voting begins.\n\nOnly verified eligible voting donations are included.\n\nUnless the published terms state otherwise, excluded amounts may include:\n\n* Failed transactions\n* Refunds\n* Disputes\n* Chargebacks\n* Fraudulent transactions\n* Duplicate transactions\n* Voided transactions\n* Payments received after the deadline\n\nThe organization must disclose whether payment-processing fees are included or excluded before voting begins.\n\n## Second Place\n\nThe second-place title is:\n\n**Miss Pretty Girls University**\n\nThe second-place scholarship amount will be published before voting begins.\n\n## Optional Third Place\n\nA third-place title and scholarship may be offered.\n\nIf offered, the title, amount, eligibility, and benefits must be announced before voting begins.\n\n**Contestant Initials: ______**",
+      "bodyMarkdown": "## First Place\n\nThe first-place title is:\n\n**Miss Pretty Girls Who Serve**\n\nThe first-place scholarship equals 10% of verified gross competition voting donations before processing fees, with a guaranteed minimum of $1,000 and a maximum of $2,500.\n\nOnly verified eligible voting donations are included. The following are excluded:\n\n* Failed transactions\n* Refunded transactions\n* Disputed or charged-back transactions\n* Fraudulent transactions\n* Duplicate transactions\n* Voided transactions\n* Payments received after the voting deadline\n\n## Second Place\n\nThe second-place title is:\n\n**Miss Pretty Girls University**\n\nThe second-place scholarship is $500.\n\n## Optional Third Place\n\nA third-place title may be activated before voting begins. If activated, the third-place scholarship is $250, and its title, eligibility, and benefits will be announced before voting begins.\n\nScholarship payments are intended to be sent by Zelle on crowning day after the final competition audit. Proof of enrollment is not required.\n\n**Contestant Initials: ______**",
       "initialRequirement": {
         "required": true,
         "role": "Contestant",
         "label": "Contestant Initials: ______"
       },
-      "bodySha256": "69659491a70a66fbfb0072eca8947b9063f1a00456f5acf59135398620bd72ed"
+      "bodySha256": "b1120379841ba8ab63350963826ca1f06e4f794d11c2f8a28f0a5da13fcf20cc"
     },
     {
       "number": 27,
@@ -367,9 +367,9 @@
     {
       "number": 41,
       "heading": "GOVERNING LAW",
-      "bodyMarkdown": "Insert attorney-approved governing-law, venue, dispute-resolution, and severability language here.\n\nDo not allow Codex to invent this section without legal instruction.",
+      "bodyMarkdown": "The governing-law, venue, dispute-resolution, and severability provisions of this Agreement may be supplemented or revised after external legal review. If a later revision materially affects an applicant or contestant, the organization will provide notice and require re-acknowledgment or re-signature where appropriate or required. Until then, the remaining published terms govern participation to the extent permitted by applicable law.",
       "initialRequirement": null,
-      "bodySha256": "66ed797437014f9ee3b1f867cb351617ea94399e6ee4edea47a85959ff0ca23a"
+      "bodySha256": "1b337b7e688f9f6c63bc8523db5b30caf252f27d44924cfb72cef6a9c165a774"
     },
     {
       "number": 42,
