@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "test": "npm run doctor && npm run build && node --test tests/rendered-html.test.mjs",
     "doctor": "node scripts/foundation-check.mjs",
