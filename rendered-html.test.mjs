@@ -1,0 +1,1 @@
+import type { Metadata } from "next";import { AuthShell } from "../components/AuthShell";export const metadata:Metadata={title:'Reset Password'};export default function Page(){return <AuthShell mode="reset"/>;}

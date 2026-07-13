@@ -1,0 +1,1 @@
+import type { Metadata } from "next";import { AuthShell } from "../components/AuthShell";export const metadata:Metadata={title:'Create Applicant Account'};export default function Page(){return <AuthShell mode="create"/>;}
