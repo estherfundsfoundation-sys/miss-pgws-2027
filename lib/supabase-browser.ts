@@ -67,6 +67,33 @@ export async function rest<T>(path:string,init:RequestInit={}) {
   return parse<T>(response);
 }
 
+export async function publicRest<T>(path:string) {
+  const missing=configurationError(); if(missing)return {data:null,error:missing,status:503} as ApiResult<T>;
+  return parse<T>(await fetch(`${url}/rest/v1/${path}`,{headers:{apikey:key,"Content-Type":"application/json"},cache:"no-store"}));
+}
+
+export async function createPrivateFileUrl(objectPath:string,expiresIn=900) {
+  const missing=configurationError(); if(missing)return {data:null,error:missing,status:503} as ApiResult<{signedURL:string}>;
+  let session=getStoredSession(); if(!session)return {data:null,error:"Please sign in to view private files.",status:401} as ApiResult<{signedURL:string}>;
+  const request=(active:AuthSession)=>fetch(`${url}/storage/v1/object/sign/pgws-private/${objectPath.split('/').map(encodeURIComponent).join('/')}`,{method:'POST',headers:headers(active),body:JSON.stringify({expiresIn})});
+  let response=await request(session);
+  if(response.status===401){const renewed=await refreshSession();if(!renewed)return {data:null,error:"Your session expired. Please sign in again.",status:401} as ApiResult<{signedURL:string}>;session=renewed;response=await request(session);}
+  const result=await parse<{signedURL:string}>(response);
+  if(result.data?.signedURL&&!result.data.signedURL.startsWith('http'))result.data.signedURL=`${url}/storage/v1${result.data.signedURL}`;
+  return result;
+}
+
+export function publicFileUrl(objectPath:string){return `${url}/storage/v1/object/public/pgws-public/${objectPath.split('/').map(encodeURIComponent).join('/')}`;}
+
+export async function uploadPublicFile(objectPath:string,file:File) {
+  const missing=configurationError(); if(missing)return {data:null,error:missing,status:503} as ApiResult<{Key:string}>;
+  let session=getStoredSession(); if(!session)return {data:null,error:"Please sign in to upload files.",status:401} as ApiResult<{Key:string}>;
+  const request=(active:AuthSession)=>fetch(`${url}/storage/v1/object/pgws-public/${objectPath.split('/').map(encodeURIComponent).join('/')}`,{method:'POST',headers:{apikey:key,Authorization:`Bearer ${active.access_token}`,'Content-Type':file.type||'application/octet-stream','x-upsert':'true'},body:file});
+  let response=await request(session);
+  if(response.status===401){const renewed=await refreshSession();if(!renewed)return {data:null,error:"Your session expired. Please sign in again.",status:401} as ApiResult<{Key:string}>;session=renewed;response=await request(session);}
+  return parse<{Key:string}>(response);
+}
+
 export async function uploadPrivateFile(objectPath:string,file:File) {
   const missing=configurationError(); if(missing)return {data:null,error:missing,status:503} as ApiResult<{Key:string}>;
   let session=getStoredSession(); if(!session)return {data:null,error:"Please sign in to upload files.",status:401} as ApiResult<{Key:string}>;
