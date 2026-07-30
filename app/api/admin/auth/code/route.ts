@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
       generated.email_otp ??
       generated.properties?.email_otp ??
       generated.action_properties?.email_otp;
-    if (!code || !/^\d{6}$/.test(code)) {
+    if (!code || !/^\d{6,8}$/.test(code)) {
       throw new Error("The authentication provider did not create a valid login code.");
     }
 

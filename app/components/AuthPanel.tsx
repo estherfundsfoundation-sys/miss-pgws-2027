@@ -33,7 +33,7 @@ function StaffAuthPanel(){
     setError('');setMessage('');setBusy(true);
     try{
       const token=code.replace(/\D/g,'');
-      if(token.length!==6)throw new Error('Enter the six-digit code from the email.');
+      if(token.length<6||token.length>8)throw new Error('Enter the login code from the email.');
       const result=await verifyEmailOtp(email,token);
       if(result.error)throw new Error(result.error);
       window.location.href='/admin';
@@ -46,7 +46,7 @@ function StaffAuthPanel(){
     {message&&<div className="notice notice--success" role="status">{message}</div>}{error&&<div className="notice" role="alert"><strong>{error}</strong></div>}
     <form className="auth-form" onSubmit={submit}>
       <div className="field"><label htmlFor="staff-email">Email address</label><input id="staff-email" type="email" value={email} readOnly autoComplete="email" /></div>
-      {codeSent&&<div className="field"><label htmlFor="staff-code">Six-digit login code</label><input id="staff-code" type="text" value={code} onChange={event=>setCode(event.target.value.replace(/\D/g,'').slice(0,6))} required inputMode="numeric" pattern="[0-9]{6}" autoComplete="one-time-code" maxLength={6} placeholder="000000" /><span className="field-help">Check nationals@estherfundsinc.org, including Spam or Promotions. Never share this code.</span></div>}
+      {codeSent&&<div className="field"><label htmlFor="staff-code">One-time login code</label><input id="staff-code" type="text" value={code} onChange={event=>setCode(event.target.value.replace(/\D/g,'').slice(0,8))} required inputMode="numeric" pattern="[0-9]{6,8}" autoComplete="one-time-code" maxLength={8} placeholder="00000000" /><span className="field-help">Check nationals@estherfundsinc.org, including Spam or Promotions. Never share this code.</span></div>}
       <button className="button button--lipstick button--wide" disabled={busy}>{busy?'Working...':codeSent?'Verify code and sign in':'Email me a code'}</button>
     </form>
     <div className="auth-meta" style={{marginTop:20}}>{codeSent?<button className="auth-link-button" type="button" disabled={busy} onClick={()=>void sendCode()}>Send a new code</button>:<span>Passwordless national access</span>}<Link href="/help-signing-in">Need help?</Link></div>
