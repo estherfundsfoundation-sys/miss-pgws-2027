@@ -1,6 +1,7 @@
 "use client";
 
-import { Fragment, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import agreement from "../../content/agreement-content.json";
 import { getStoredSession, rest, uploadPrivateFile } from "@/lib/supabase-browser";
 
@@ -41,6 +42,7 @@ export function AgreementDocument() {
   const [finalChecked,setFinalChecked]=useState(false);
   const [submitMessage,setSubmitMessage]=useState('');
   const [submitting,setSubmitting]=useState(false);
+  const [verifiedSigned,setVerifiedSigned]=useState(false);
   const completed=requiredSections.filter((n)=>initials[n]?.trim().length>=2).length+agreement.finalAcknowledgments.filter((_,i)=>acks[i]).length+(signaturePresent?1:0)+(finalChecked?1:0);
   const total=requiredSections.length+agreement.finalAcknowledgments.length+2;
   const progress=Math.round(completed/total*100);
@@ -48,8 +50,52 @@ export function AgreementDocument() {
   const canSubmit=completed===total&&requiredFieldLabels.every((label)=>fields[label]?.trim());
   const preamble=agreement.preambleMarkdown.replace(/^#.*$/gm,'').replace(/^\*\*Agreement Version:.*$/gm,'').replace(/^\*\*Effective Date:.*$/gm,'').replace(/^\*\*Competition Year:.*$/gm,'').trim();
 
+  useEffect(()=>{async function checkSignedStatus(){const session=getStoredSession();if(!session)return;const applications=await rest<{agreement_status:string}[]>(`pgws_applications?user_id=eq.${session.user.id}&select=agreement_status&limit=1`);if(applications.data?.[0]?.agreement_status==='signed'){setVerifiedSigned(true);setSubmitMessage('Your signed agreement is already verified and attached to your application.');}}void checkSignedStatus();},[]);
+
   function download(){const current=[`# ${agreement.metadata.title}`,`## ${agreement.metadata.subtitle}`,agreement.metadata.documentType,'**Agreement Version:** 2027.07.13-current','**Effective Date:** July 13, 2026',agreement.preambleMarkdown,...agreement.sections.map((section)=>`# ${section.number}. ${section.heading}\n\n${section.bodyMarkdown}`),'# FINAL ACKNOWLEDGMENTS',...agreement.finalAcknowledgments.map((item)=>`* ${item}`)].join('\n\n');const blob=new Blob([current],{type:'text/markdown;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='Miss-PGWS-2027-Applicant-Contestant-Agreement.md';a.click();URL.revokeObjectURL(url);}
-  async function signAgreement(){setSubmitMessage('');setSubmitting(true);try{const session=getStoredSession();if(!session)throw new Error('Please sign in before signing the agreement.');const versions=await rest<{id:string;version_label:string;source_sha256:string}[]>('pgws_agreement_versions?active=eq.true&select=id,version_label,source_sha256&limit=1');const version=versions.data?.[0];if(!version)throw new Error('Staff must publish an active current agreement version before signatures can be accepted.');const applications=await rest<{id:string}[]>(`pgws_applications?user_id=eq.${session.user.id}&select=id&limit=1`);const applicationId=applications.data?.[0]?.id;if(!applicationId)throw new Error('Your application record is not ready. Sign out, sign back in, and try again.');if(!signatureData)throw new Error('Draw your signature before continuing.');const signatureBlob=await(await fetch(signatureData)).blob();const signatureFile=new File([signatureBlob],'electronic-signature.png',{type:'image/png'});const uniqueName=`${Date.now()}-${crypto.randomUUID()}.png`;const objectPath=`${session.user.id}/${applicationId}/agreement/${version.id}/${uniqueName}`;const upload=await uploadPrivateFile(objectPath,signatureFile);if(upload.error)throw new Error(`Signature upload failed: ${upload.error}`);const initialRows=requiredSections.map(section_number=>({section_number,initials:initials[section_number].trim().toUpperCase()}));const signedAt=new Date().toISOString();const applicantSnapshot={full_legal_name:fields['Full Legal Name'],email:fields['Applicant Email'],college:fields['College or University'],date_of_birth:fields['Date of Birth'],typed_legal_name:fields['Type Full Legal Name'],signed_at:signedAt,agreement_version:version.version_label,source_sha256:version.source_sha256};const snapshot=JSON.stringify({applicantSnapshot,acknowledgments:agreement.finalAcknowledgments,initials:initialRows.map(r=>({section:r.section_number,initials:r.initials}))});const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(snapshot));const hash=[...new Uint8Array(digest)].map(value=>value.toString(16).padStart(2,'0')).join('');const signatureResult=await rest('rpc/pgws_finalize_agreement',{method:'POST',body:JSON.stringify({p_application_id:applicationId,p_agreement_version_id:version.id,p_initials:initialRows,p_applicant_snapshot:applicantSnapshot,p_acknowledgment_snapshot:{items:agreement.finalAcknowledgments,accepted:true},p_signature_object_path:objectPath,p_signature_method:'drawn',p_user_agent:navigator.userAgent,p_immutable_record_hash:hash})});if(signatureResult.error)throw new Error(signatureResult.error);setSubmitMessage('Success — your signed agreement is attached to your application. Submitted applications are now recorded as 100% complete. You may return to your portal.');}catch(reason){const message=reason instanceof Error?reason.message:'The agreement could not be signed.';setSubmitMessage(message);}finally{setSubmitting(false);}}
+  async function signAgreement(){
+    setSubmitMessage('');
+    setSubmitting(true);
+    try{
+      const session=getStoredSession();
+      if(!session)throw new Error('Please sign in before signing the agreement.');
+      const versions=await rest<{id:string;version_label:string;source_sha256:string}[]>('pgws_agreement_versions?active=eq.true&select=id,version_label,source_sha256&limit=1');
+      const version=versions.data?.[0];
+      if(!version)throw new Error('The current agreement is temporarily unavailable. Please refresh and try again.');
+      const applications=await rest<{id:string;agreement_status:string}[]>(`pgws_applications?user_id=eq.${session.user.id}&select=id,agreement_status&limit=1`);
+      const application=applications.data?.[0];
+      if(!application?.id)throw new Error('Your application record is not ready. Sign out, sign back in, and try again.');
+      if(application.agreement_status==='signed'){
+        setVerifiedSigned(true);
+        setSubmitMessage('Your signed agreement is already verified and attached to your application.');
+        return;
+      }
+      if(!signatureData)throw new Error('Draw your signature before continuing.');
+      const signatureBlob=await(await fetch(signatureData)).blob();
+      const signatureFile=new File([signatureBlob],'electronic-signature.png',{type:'image/png'});
+      const uniqueName=`${Date.now()}-${crypto.randomUUID()}.png`;
+      const objectPath=`${session.user.id}/${application.id}/agreement/${version.id}/${uniqueName}`;
+      const upload=await uploadPrivateFile(objectPath,signatureFile);
+      if(upload.error)throw new Error(`Signature upload failed: ${upload.error}`);
+      const initialRows=requiredSections.map(section_number=>({section_number,initials:initials[section_number].trim().toUpperCase()}));
+      const signedAt=new Date().toISOString();
+      const applicantSnapshot={full_legal_name:fields['Full Legal Name'],email:fields['Applicant Email'],college:fields['College or University'],date_of_birth:fields['Date of Birth'],typed_legal_name:fields['Type Full Legal Name'],signed_at:signedAt,agreement_version:version.version_label,source_sha256:version.source_sha256};
+      const snapshot=JSON.stringify({applicantSnapshot,acknowledgments:agreement.finalAcknowledgments,initials:initialRows.map(r=>({section:r.section_number,initials:r.initials}))});
+      const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(snapshot));
+      const hash=[...new Uint8Array(digest)].map(value=>value.toString(16).padStart(2,'0')).join('');
+      const signatureResult=await rest('rpc/pgws_finalize_agreement',{method:'POST',body:JSON.stringify({p_application_id:application.id,p_agreement_version_id:version.id,p_initials:initialRows,p_applicant_snapshot:applicantSnapshot,p_acknowledgment_snapshot:{items:agreement.finalAcknowledgments,accepted:true},p_signature_object_path:objectPath,p_signature_method:'drawn',p_user_agent:navigator.userAgent,p_immutable_record_hash:hash})});
+      if(signatureResult.error)throw new Error(signatureResult.error);
+      const verification=await rest<{agreement_status:string}[]>(`pgws_applications?id=eq.${application.id}&select=agreement_status&limit=1`);
+      if(verification.error||verification.data?.[0]?.agreement_status!=='signed')throw new Error('Your signature was received, but the attachment could not be verified. Please refresh this page and retry; you will not lose your application.');
+      setVerifiedSigned(true);
+      setSubmitMessage('Success — your signed agreement is verified and attached to your application.');
+    }catch(reason){
+      const message=reason instanceof Error?reason.message:'The agreement could not be signed.';
+      setSubmitMessage(message);
+    }finally{
+      setSubmitting(false);
+    }
+  }
 
   return <div className="legal-layout">
     <aside className="legal-rail no-print">
@@ -62,6 +108,7 @@ export function AgreementDocument() {
     <article className="legal-document">
       <header className="legal-masthead"><p><strong>{agreement.metadata.title}</strong></p><h1>{agreement.metadata.subtitle}</h1><p>{agreement.metadata.documentType}</p></header>
       <div className="legal-meta"><div><b>Agreement Version</b><br />2027.07.13-current</div><div><b>Effective Date</b><br />July 13, 2026</div><div><b>Competition Year</b><br />{agreement.metadata.competitionYear}</div></div>
+      {verifiedSigned&&<div className="notice no-print" style={{marginTop:18}}><span>✓</span><div><strong>Agreement signed and attached.</strong><br />Your application record has been verified. You do not need to sign again.<div style={{marginTop:14}}><Link className="button button--ink button--small" href="/application">Return to application</Link></div></div></div>}
       <div className="notice no-print" style={{marginTop:18}}><span>◆</span><div><strong>Current agreement notice.</strong><br />External legal review remains recommended. Section 41 explains how later material revisions will be handled, including notice and re-acknowledgment where appropriate or required. This notice does not prevent signing or submitting.</div></div>
       <div className="legal-preamble"><Markdown value={preamble} /></div>
       {agreement.sections.map((section)=>{
@@ -79,7 +126,7 @@ export function AgreementDocument() {
         <div className="signature-grid">{agreement.signature.fields.filter((field)=>!['Draw or Upload Signature','Date Signed','Time Signed','Agreement Version'].includes(field.label)).map((field)=><div className="field" key={field.label}><label htmlFor={`signature-${field.label}`}>{field.label} <span className="required">*</span></label><input id={`signature-${field.label}`} type={field.label==='Applicant Email'?'email':field.label==='Date of Birth'?'date':'text'} value={fields[field.label]||''} onChange={(event)=>setFields((old)=>({...old,[field.label]:event.target.value}))} /></div>)}</div>
         <div className="field" style={{marginTop:22}}><label>Draw your signature <span className="required">*</span></label><SignaturePad onChange={(present,dataUrl)=>{setSignaturePresent(present);setSignatureData(dataUrl||'');}} /><span className="field-help">Your drawn signature is stored privately with the frozen agreement version and signed record.</span></div>
         <label className="checkbox-row" style={{marginTop:18}}><input type="checkbox" checked={finalChecked} onChange={(event)=>setFinalChecked(event.target.checked)} /><span>{agreement.signature.finalCheckbox}</span></label>
-        <div className="legal-submit"><p><strong>Signed date, time, version, account, and application ID are recorded automatically at final submission.</strong></p><button type="button" className="button button--lipstick button--wide" disabled={!canSubmit||submitting} onClick={signAgreement}>{submitting?'Securing signed record…':'Sign & attach to application'}</button>{!canSubmit&&<p className="field-help" style={{textAlign:'center'}}>Complete every required initial, acknowledgment, applicant field, signature, and final checkbox to continue.</p>}{submitMessage&&<p role="status" style={{textAlign:'center'}}>{submitMessage}</p>}</div>
+        <div className="legal-submit"><p><strong>Signed date, time, version, account, and application ID are recorded automatically at final submission.</strong></p>{verifiedSigned?<Link className="button button--ink button--wide" href="/application">Return to application</Link>:<button type="button" className="button button--lipstick button--wide" disabled={!canSubmit||submitting} onClick={signAgreement}>{submitting?'Securing signed record…':'Sign & attach to application'}</button>}{!verifiedSigned&&!canSubmit&&<p className="field-help" style={{textAlign:'center'}}>Complete every required initial, acknowledgment, applicant field, signature, and final checkbox to continue.</p>}{submitMessage&&<p role="status" style={{textAlign:'center'}}>{submitMessage}</p>}</div>
       </section>
     </article>
   </div>;

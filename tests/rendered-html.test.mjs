@@ -54,3 +54,29 @@ test("includes the application shell and supplied brand assets", async () => {
 
   await Promise.all(requiredPaths.map((file) => access(new URL(file, root))));
 });
+
+test("uses code-only national staff login while preserving role authorization", async () => {
+  const [authPanel, browserAuth, codeRoute, adminClient, migration] = await Promise.all([
+    readFile(new URL("app/components/AuthPanel.tsx", root), "utf8"),
+    readFile(new URL("lib/supabase-browser.ts", root), "utf8"),
+    readFile(new URL("app/api/admin/auth/code/route.ts", root), "utf8"),
+    readFile(new URL("app/admin/AdminClient.tsx", root), "utf8"),
+    readFile(new URL("supabase/migrations/006_admin_passwordless_login.sql", root), "utf8"),
+  ]);
+
+  assert.match(authPanel, /No password is needed/);
+  assert.match(authPanel, /autoComplete="one-time-code"/);
+  assert.match(authPanel, /Verify code and sign in/);
+  assert.match(browserAuth, /type:"email"/);
+
+  assert.match(codeRoute, /nationals@estherfundsinc\.org/);
+  assert.match(codeRoute, /SUPABASE_SECRET_KEY/);
+  assert.match(codeRoute, /pgws_admin_login_requests/);
+  for (const role of ["reviewer", "competition_admin", "finance_admin", "super_admin"]) {
+    assert.match(codeRoute, new RegExp(role));
+  }
+  assert.match(adminClient, /pgws_user_roles/);
+  assert.match(adminClient, /active=eq\.true/);
+  assert.match(migration, /enable row level security/);
+  assert.match(migration, /No OTP values are stored/);
+});
