@@ -12,7 +12,7 @@
     "contactEmail": "nationals@estherfundsinc.org",
     "canonicalDomain": "misspgws.estherfundsfoundation.org",
     "urls": {
-      "interestGroupMe": "https://groupme.com/join_group/115921498/tk7wjcpw",
+      "interestGroupMe": "mailto:nationals@estherfundsinc.org?subject=Miss%20PGWS%202027%20community%20chat%20access",
       "jotformVoting": "https://pci.jotform.com/form/261934135860156",
       "jotformVotingFormId": "261934135860156",
       "estherFundsFoundation": "https://www.estherfundsfoundation.org"
@@ -110,7 +110,7 @@
     "interestGroup": {
       "availability": "Public before applying and available from the application page.",
       "buttonLabel": "Join the Interest GroupMe",
-      "url": "https://groupme.com/join_group/115921498/tk7wjcpw",
+      "url": "mailto:nationals@estherfundsinc.org?subject=Miss%20PGWS%202027%20community%20chat%20access",
       "confirmationInstruction": "Immediately provide the interest group-chat link.",
       "emailInstruction": "The interest group-chat link must also be sent by email.",
       "notice": "The interest group chat is for general updates, reminders, and community. The website, applicant portal, official calendar, written agreement, and official emails remain the primary sources of information.",
