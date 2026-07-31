@@ -28,6 +28,20 @@ export async function signIn(email:string,password:string) {
   if(result.data)storeSession(result.data); return result;
 }
 
+export async function requestAdminLoginCode(email:string) {
+  const response=await fetch("/api/admin/auth/code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
+  const body=await response.json().catch(()=>({}));
+  if(!response.ok)return {data:null,error:body.error||"The login code could not be sent.",status:response.status} as ApiResult<{message:string}>;
+  return {data:{message:body.message||"A secure login code was sent."},error:null,status:response.status} as ApiResult<{message:string}>;
+}
+
+export async function verifyEmailOtp(email:string,token:string) {
+  const missing=configurationError(); if(missing)return {data:null,error:missing,status:503} as ApiResult<AuthSession>;
+  const result=await parse<AuthSession>(await fetch(`${url}/auth/v1/verify`,{method:"POST",headers:headers(),body:JSON.stringify({email,token,type:"email"})}));
+  if(result.data?.access_token)storeSession(result.data);
+  return result;
+}
+
 export async function refreshSession() {
   const current=getStoredSession();
   if(!current?.refresh_token||!url||!key){storeSession(null);return null;}
