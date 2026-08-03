@@ -99,7 +99,9 @@ export async function POST(request: NextRequest) {
     if (mode === "preview") return NextResponse.json(evaluation);
     const submitted: Candidate[] = [];
     const failed: Array<Candidate & { error: string }> = [];
+    const warnings: Array<Candidate & { error: string }> = [];
     for (const candidate of evaluation.eligible) {
+      let applicationUpdated = false;
       try {
         const now = new Date().toISOString();
         const updated = await serviceFetch(`/rest/v1/pgws_applications?id=eq.${encodeURIComponent(candidate.applicationId)}&status=eq.draft&submitted_at=is.null`, {
@@ -107,14 +109,21 @@ export async function POST(request: NextRequest) {
           body: JSON.stringify({ status: "submitted", completion_percent: 100, submitted_at: now, locked_at: now, updated_at: now }),
         });
         if (!(updated as Row[]).length) throw new Error("The record changed after preview; no update was made.");
+        applicationUpdated = true;
         await insert("/rest/v1/pgws_status_history", { application_id: candidate.applicationId, from_status: "draft", to_status: "submitted", changed_by: actor.id, reason: "Staff recovery of a verified complete signed draft after applicant submission difficulty." });
-        await insert("/rest/v1/pgws_audit_log", { actor_user_id: actor.id, action: "application_submitted_by_staff_recovery", entity_type: "pgws_application", entity_id: candidate.applicationId, metadata: { source: "admin_submission_recovery", applicant_user_id: candidate.userId } });
+        await insert("/rest/v1/pgws_audit_log", { actor_id: actor.id, action: "application_submitted_by_staff_recovery", entity_type: "application", entity_id: candidate.applicationId, new_value: { status: "submitted", source: "admin_submission_recovery", applicant_user_id: candidate.userId }, reason: "Staff recovered a verified complete signed draft after applicant submission difficulty." });
         submitted.push(candidate);
       } catch (reason) {
-        failed.push({ ...candidate, error: reason instanceof Error ? reason.message : "Unknown error" });
+        const item = { ...candidate, error: reason instanceof Error ? reason.message : "Unknown error" };
+        if (applicationUpdated) {
+          submitted.push(candidate);
+          warnings.push(item);
+        } else {
+          failed.push(item);
+        }
       }
     }
-    return NextResponse.json({ ...evaluation, submitted, failed });
+    return NextResponse.json({ ...evaluation, submitted, failed, warnings });
   } catch (reason) {
     const message = reason instanceof Error ? reason.message : "Submission recovery failed.";
     const status = /sign-in|session|access/i.test(message) ? 403 : 500;

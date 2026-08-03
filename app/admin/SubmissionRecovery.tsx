@@ -5,7 +5,7 @@ import { getStoredSession } from "@/lib/supabase-browser";
 
 type Candidate = { applicationId: string; name: string; email: string };
 type Skipped = Candidate & { reasons: string[] };
-type Result = { eligible: Candidate[]; skipped: Skipped[]; submitted?: Candidate[]; failed?: Array<Candidate & { error: string }> };
+type Result = { eligible: Candidate[]; skipped: Skipped[]; submitted?: Candidate[]; failed?: Array<Candidate & { error: string }>; warnings?: Array<Candidate & { error: string }> };
 
 async function request(mode: "preview" | "submit") {
   const session = getStoredSession();
@@ -40,7 +40,7 @@ export function SubmissionRecovery({ onSubmitted }: { onSubmitted: () => void })
     try {
       const next = await request("submit");
       setResult(next);
-      if (next.submitted?.length && !next.failed?.length) onSubmitted();
+      if (next.submitted?.length && !next.failed?.length && !next.warnings?.length) onSubmitted();
     } catch (reason) { setError(reason instanceof Error ? reason.message : "Submission recovery failed."); }
     finally { setBusy(false); }
   }
@@ -59,6 +59,7 @@ export function SubmissionRecovery({ onSubmitted }: { onSubmitted: () => void })
       {result.eligible.length > 0 && <details open><summary>Eligible applicants</summary><ul>{result.eligible.map((item) => <li key={item.applicationId}>{item.name} ({item.email})</li>)}</ul></details>}
       {result.skipped.length > 0 && <details><summary>Skipped applicants and reasons</summary><ul>{result.skipped.map((item) => <li key={item.applicationId}>{item.name} ({item.email}): {item.reasons.join("; ")}</li>)}</ul></details>}
       {result.submitted && <p className="notice"><strong>{result.submitted.length}</strong> application{result.submitted.length === 1 ? " was" : "s were"} submitted by recovery.</p>}
+      {result.warnings && result.warnings.length > 0 && <div className="notice" role="alert"><strong>{result.warnings.length} submitted with a follow-up logging warning:</strong><ul>{result.warnings.map((item) => <li key={item.applicationId}>{item.name}: {item.error}</li>)}</ul></div>}
       {result.failed && result.failed.length > 0 && <div className="notice" role="alert"><strong>{result.failed.length} failed:</strong><ul>{result.failed.map((item) => <li key={item.applicationId}>{item.name}: {item.error}</li>)}</ul></div>}
     </div>}
   </section>;
