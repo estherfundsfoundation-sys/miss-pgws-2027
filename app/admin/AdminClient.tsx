@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getStoredSession, rest } from "@/lib/supabase-browser";
+import { SubmissionRecovery } from "./SubmissionRecovery";
 
 type Role = { role: string; active: boolean };
 type Application = {
@@ -100,6 +101,7 @@ export function AdminClient() {
       <div className="stat-card"><strong>{ready}</strong><span>signed agreements</span></div>
       <div className="stat-card"><strong>{applications.filter((application) => application.status === "accepted").length}</strong><span>accepted contestants</span></div>
     </div>
+    <SubmissionRecovery onSubmitted={() => window.location.reload()} />
     <section className="panel">
       <div style={{display:"flex",justifyContent:"space-between",gap:18,alignItems:"center",flexWrap:"wrap"}}>
         <div><p className="eyebrow">APPLICATION REVIEW</p><h2>All applicant records</h2><p className="field-help">The authorized contact export includes names, emails, progress, and status only. It excludes answers, signatures, and uploaded files.</p></div>
