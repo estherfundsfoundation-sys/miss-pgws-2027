@@ -1,1 +1,6 @@
-import{AdminFrame}from"../AdminFrame";export default function Page(){return <AdminFrame current="/admin/contestants" title="Contestant operations." intro="Promote accepted applicants without creating a second account, publish approved profiles, assign tasks, and preserve every prior record."><div className="panel"><h2>Contestant cohort</h2><p>Accepted applicants appear here after staff records acceptance and the applicant confirms her position.</p></div></AdminFrame>}
+import { AdminFrame } from "../AdminFrame";
+import { ContestantOperations } from "./ContestantOperations";
+
+export default function Page() {
+  return <AdminFrame current="/admin/contestants" title="The contestant command center." intro="Focus on the accepted cohort, track campaign readiness, prepare the voting roster, publish profiles, and preserve every decision in one place."><ContestantOperations /></AdminFrame>;
+}

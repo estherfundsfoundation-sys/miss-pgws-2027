@@ -339,3 +339,70 @@ img { display: block; max-width: 100%; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
 }
+
+/* The New Beauty Issue campaign workspace */
+.new-beauty-portal-hero {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(255,250,247,.96), rgba(255,250,247,.76)),
+    url('/new-beauty-issue-hero.png') center 42% / cover;
+}
+.new-beauty-portal-hero::after { content: ""; position: absolute; inset: 18px; border: 1px solid rgba(201,164,106,.55); pointer-events: none; }
+.campaign-studio { max-width: 1260px; margin: auto; }
+.campaign-cover-card { overflow: hidden; display: grid; grid-template-columns: minmax(320px,.72fr) minmax(420px,1.28fr); border: 1px solid rgba(169,79,110,.2); border-radius: 24px; background: #fffaf7; box-shadow: var(--shadow); }
+.campaign-cover-card > img { width: 100%; height: 100%; max-height: 720px; object-fit: cover; }
+.campaign-cover-card > div { align-self: center; padding: clamp(36px,6vw,78px); }
+.campaign-cover-card h2 { margin: 0 0 22px; font-family: var(--display); font-size: clamp(44px,5.5vw,76px); font-weight: 400; line-height: .95; }
+.campaign-cover-card blockquote { margin: 0 0 22px; padding: 22px 0 22px 24px; border-left: 3px solid var(--gold); color: #6e2541; font-family: var(--display); font-size: clamp(24px,2.7vw,38px); line-height: 1.15; }
+.campaign-studio-grid { display: grid; grid-template-columns: .86fr 1.14fr; gap: 24px; }
+.campaign-studio-grid .panel { height: calc(100% - 24px); }
+.record-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; flex-wrap: wrap; }
+.record-heading .eyebrow { margin-bottom: 8px; }
+.readiness-list, .score-list { display: grid; gap: 0; margin: 22px 0; border-top: 1px solid #eadfe2; }
+.readiness-list > div, .score-list > div { display: flex; justify-content: space-between; gap: 18px; padding: 11px 0; border-bottom: 1px solid #eadfe2; font-size: 13px; }
+.readiness-list > div > span:first-child { color: var(--lipstick); font-weight: 900; }
+.score-list strong { color: var(--rose); white-space: nowrap; }
+.campaign-editor-panel { padding: clamp(28px,5vw,58px); }
+.campaign-school { color: var(--rose); font-size: 13px; font-weight: 800; }
+.campaign-publish-actions, .contestant-card-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.contestant-gallery-tools { display: flex; justify-content: space-between; align-items: end; gap: 30px; margin-bottom: 30px; }
+.contestant-gallery-tools h2 { margin: 0; font-family: var(--display); font-size: clamp(38px,5vw,66px); font-weight: 400; }
+.contestant-gallery-tools .field { width: min(100%,420px); }
+.contestant-profile-card { scroll-margin-top: 130px; }
+.campaign-video { margin-top: 24px; }
+.campaign-video video { width: 100%; border-radius: 12px; background: #000; }
+.command-bar { display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
+.command-filters { display: grid; grid-template-columns: minmax(280px,1fr) minmax(190px,.35fr); gap: 18px; margin: 24px 0; }
+.operations-table td { vertical-align: top; }
+.operations-table td strong, .operations-table td small, .operations-table td > span { display: block; }
+.operations-table td small { color: var(--muted); font-size: 10px; }
+.operations-table .status { display: inline-flex; }
+.mini-check { display: flex; gap: 6px; align-items: center; color: var(--muted); font-size: 10px; }
+.mini-check input { width: 15px; height: 15px; accent-color: var(--lipstick); }
+.mini-hours { display: flex; align-items: center; gap: 5px; margin-top: 5px; color: var(--muted); font-size: 9px; }
+.mini-hours input { width: 56px; padding: 3px 5px; border: 1px solid #d9ced2; border-radius: 5px; }
+.tracker-yes { color: #28573b; font-weight: 800; }
+.tracker-no { color: #907f85; }
+.scoring-selector { display: flex; align-items: end; justify-content: space-between; gap: 24px; }
+.scoring-selector .field { min-width: min(100%,520px); }
+.scoring-total { text-align: right; }
+.scoring-total strong { display: block; color: var(--lipstick); font-family: var(--display); font-size: 48px; font-weight: 400; line-height: 1; }
+.scoring-total span { color: var(--muted); font-size: 11px; }
+.scoring-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 28px 0; }
+.score-input { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 17px; border: 1px solid #e7dce0; border-radius: 10px; background: #fffafb; font-size: 12px; font-weight: 800; }
+.score-input > div { display: flex; align-items: center; gap: 7px; color: var(--rose); white-space: nowrap; }
+.score-input input { width: 76px; min-height: 42px; border: 1px solid #cfc4c8; border-radius: 8px; text-align: center; }
+.scoring-reason { margin-bottom: 20px; }
+
+@media (max-width: 900px) {
+  .campaign-cover-card, .campaign-studio-grid { grid-template-columns: 1fr; }
+  .campaign-cover-card > img { max-height: 600px; }
+  .command-filters, .scoring-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 620px) {
+  .contestant-gallery-tools, .scoring-selector { align-items: stretch; flex-direction: column; }
+  .contestant-gallery-tools .field, .scoring-selector .field { width: 100%; min-width: 0; }
+  .scoring-total { text-align: left; }
+  .campaign-publish-actions .button, .contestant-card-actions .button { width: 100%; }
+}
