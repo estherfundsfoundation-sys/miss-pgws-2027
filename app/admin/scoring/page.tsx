@@ -1,1 +1,6 @@
-import{AdminFrame}from"../AdminFrame";export default function Page(){return <AdminFrame current="/admin/scoring" title="Performance scoring." intro="Record the 100-point performance rubric while the verified-voting calculation remains the primary 85% of final placement."><div className="panel"><h2>Official 100-point rubric</h2><div className="deadline-list">{[['Official Campaign Video','40'],['Application Quality','15'],['Queen Training Attendance and Punctuality','10'],['Queen Training Participation','15'],['Service and Advocacy','10'],['Portal Compliance and Deadlines','5'],['Campaign Professionalism','5']].map(([label,points])=><div className="deadline-item" key={label}><b>{label}</b><span>{points} points</span></div>)}</div></div></AdminFrame>}
+import { AdminFrame } from "../AdminFrame";
+import { ScoringWorkspace } from "./ScoringWorkspace";
+
+export default function Page() {
+  return <AdminFrame current="/admin/scoring" title="Performance scoring." intro="Record the published 100-point rubric, document every score, and let each contestant follow her points from her private campaign profile."><ScoringWorkspace /></AdminFrame>;
+}
