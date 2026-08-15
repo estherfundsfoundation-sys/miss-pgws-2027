@@ -179,32 +179,32 @@
         "end": "2026-08-15T23:59:59-04:00"
       },
       {
-        "id": "campaign-video-due",
-        "label": "Campaign video due",
-        "display": "August 19, 2026",
-        "start": null,
-        "end": "2026-08-19T23:59:59-04:00"
-      },
-      {
-        "id": "video-review-and-corrections",
-        "label": "Video review and corrections",
-        "display": "August 20–21, 2026",
-        "start": "2026-08-20T00:00:00-04:00",
-        "end": "2026-08-21T23:59:59-04:00"
-      },
-      {
-        "id": "contestant-profiles-published",
-        "label": "Contestant profiles published",
-        "display": "August 22, 2026",
-        "start": "2026-08-22T00:00:00-04:00",
-        "end": "2026-08-22T23:59:59-04:00"
-      },
-      {
-        "id": "campaign-preparation",
-        "label": "Campaign preparation",
-        "display": "August 22–26, 2026",
-        "start": "2026-08-22T00:00:00-04:00",
+        "id": "campaign-creation-window",
+        "label": "Campaign creation and Contestant Studio build",
+        "display": "August 15–26, 2026",
+        "start": "2026-08-15T00:00:00-04:00",
         "end": "2026-08-26T23:59:59-04:00"
+      },
+      {
+        "id": "foundation-contestant-reveal-window",
+        "label": "Foundation contestant reveals",
+        "display": "August 25–26, 2026",
+        "start": "2026-08-25T00:00:00-04:00",
+        "end": "2026-08-26T23:59:59-04:00"
+      },
+      {
+        "id": "contestant-announcement-post",
+        "label": "Contestant announcement graphic",
+        "display": "August 26, 2026 at 10:00 AM ET",
+        "start": "2026-08-26T10:00:00-04:00",
+        "end": null
+      },
+      {
+        "id": "official-campaign-video-post",
+        "label": "Official campaign video post",
+        "display": "August 27, 2026 at 10:00 AM ET",
+        "start": "2026-08-27T10:00:00-04:00",
+        "end": null
       },
       {
         "id": "voting-opens",
@@ -214,6 +214,13 @@
         "end": null
       },
       {
+        "id": "campaign-week",
+        "label": "Campaign week",
+        "display": "August 27–September 3, 2026",
+        "start": "2026-08-27T12:00:00-04:00",
+        "end": "2026-09-03T23:59:00-04:00"
+      },
+      {
         "id": "voting-closes",
         "label": "Voting closes",
         "display": "September 3, 2026 at 11:59 PM ET",
@@ -221,18 +228,11 @@
         "end": "2026-09-03T23:59:00-04:00"
       },
       {
-        "id": "final-audit",
-        "label": "Final audit",
+        "id": "final-verification-and-winners-announced",
+        "label": "Final verification and winners announced",
         "display": "September 4, 2026",
         "start": "2026-09-04T00:00:00-04:00",
         "end": "2026-09-04T23:59:59-04:00"
-      },
-      {
-        "id": "virtual-crowning-and-scholarship-payment",
-        "label": "Virtual crowning and scholarship payment",
-        "display": "September 5, 2026",
-        "start": "2026-09-05T00:00:00-04:00",
-        "end": "2026-09-05T23:59:59-04:00"
       }
     ]
   },
@@ -285,31 +285,36 @@
         ]
       },
       {
-        "title": "Campaign Video",
+        "title": "Campaign Creation and Contestant Studio",
         "dateIds": [
-          "campaign-video-due",
-          "video-review-and-corrections"
+          "campaign-creation-window"
         ]
       },
       {
-        "title": "Contestant Profiles and Campaign Preparation",
+        "title": "Contestant Reveal",
         "dateIds": [
-          "contestant-profiles-published",
-          "campaign-preparation"
+          "foundation-contestant-reveal-window",
+          "contestant-announcement-post"
+        ]
+      },
+      {
+        "title": "Official Campaign Video",
+        "dateIds": [
+          "official-campaign-video-post"
         ]
       },
       {
         "title": "Voting",
         "dateIds": [
           "voting-opens",
+          "campaign-week",
           "voting-closes"
         ]
       },
       {
-        "title": "Final Audit and Crowning",
+        "title": "Final Verification and Winner Announcement",
         "dateIds": [
-          "final-audit",
-          "virtual-crowning-and-scholarship-payment"
+          "final-verification-and-winners-announced"
         ]
       }
     ],

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getStoredSession, rest } from "@/lib/supabase-browser";
+import { BingoCelebration } from "./BingoCelebration";
 
 type Application = { id: string; status: string; completion_percent: number; agreement_status: string; updated_at: string };
 
@@ -45,6 +46,7 @@ export function PortalClient() {
       <div className="hero-actions">{accepted ? <Link className="button button--lipstick" href="/portal/campaign">Open contestant studio</Link> : <Link className="button button--lipstick" href="/application">Open application</Link>}<Link className="button button--paper" href="/timeline">View official calendar</Link></div>
     </section>
     {accepted && <section className="panel campaign-access"><p className="eyebrow">ACCEPTED CONTESTANT</p><h2>The world has a beauty issue—and your voice belongs in it.</h2><p>Your live studio includes the official campaign question, profile-readiness checklist, publication button, scoring breakdown, and campaign deadlines.</p><Link className="button button--lipstick" href="/portal/campaign">Build and publish my profile</Link></section>}
+    {accepted && <BingoCelebration />}
     <section className="panel"><h2>Your competition workspace</h2><div className="editorial-grid" style={{ marginTop: 18 }}>
       <article className="editorial-card" data-number="01"><h3>Application</h3><p>Your original application and acceptance record stay safely connected to this account.</p><Link href="/application">Open application →</Link></article>
       <article className="editorial-card" data-number="02"><h3>Contestant studio</h3><p>Headshot, story, platform, campaign video, Instagram link, points, and publication.</p><Link href="/portal/campaign">Open studio →</Link></article>

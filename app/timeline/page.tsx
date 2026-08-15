@@ -26,7 +26,7 @@ export default function TimelinePage() {
             </article>
           ))}
         </div>
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 46 }}><Link className="button button--lipstick" href="/apply">Start your application</Link></div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 46 }}><Link className="button button--lipstick" href="/road-to-the-crown">Open the interactive Road to the Crown</Link></div>
       </section>
       <SiteFooter />
     </main>
