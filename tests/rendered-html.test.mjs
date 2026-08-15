@@ -72,3 +72,32 @@ test("includes the complete vote education and donor support experience", async 
     assert.match(source, new RegExp(requiredCopy.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
 });
+
+test("includes the Studio finish state and connected platform generator", async () => {
+  const [studio, roadmap] = await Promise.all([
+    readFile(new URL("app/portal/campaign/CampaignProfileEditor.tsx", root), "utf8"),
+    readFile(new URL("app/road-to-the-crown/RoadToCrownClient.tsx", root), "utf8"),
+  ]);
+
+  for (const requiredCopy of [
+    "STUDIO COMPLETE",
+    "Finish & publish my Studio",
+    "Platform Points Generator draft followed you here",
+  ]) {
+    assert.match(studio, new RegExp(requiredCopy.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+
+  for (const requiredCopy of [
+    "THE PLATFORM POINTS GENERATOR",
+    "Generate my platform points",
+    "YOUR PERSONALIZED CAMPAIGN-WEEK IDEAS",
+    "Send this plan to my Studio",
+    "THE NATIONAL WINNER EXPERIENCE",
+    "$1,000–$2,500 First-Place Scholarship",
+    "A Foundation-Sponsored Brunch in Her Honor",
+    "EVERY CONTESTANT RECEIVES",
+    "Fundraising Impact Letter",
+  ]) {
+    assert.match(roadmap, new RegExp(requiredCopy.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+});

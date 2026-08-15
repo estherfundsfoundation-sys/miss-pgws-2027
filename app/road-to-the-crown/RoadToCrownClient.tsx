@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { CSSProperties } from "react";
+import type { CSSProperties, FormEvent } from "react";
 
 type Milestone = {
   id: string;
@@ -13,6 +13,12 @@ type Milestone = {
   summary: string;
   actions: string[];
   link?: { href: string; label: string };
+};
+
+type PlatformPlan = {
+  theme: string;
+  points: { title: string; body: string }[];
+  campaignIdeas: string[];
 };
 
 const milestones: Milestone[] = [
@@ -182,6 +188,16 @@ const voteBundles = [
 
 const voteGoalPresets = [100, 250, 500, 750, 1000] as const;
 
+const platformFrameworks = {
+  educate: ["EDUCATE", "EQUIP", "EMPOWER"],
+  mentor: ["AFFIRM", "GUIDE", "CONNECT"],
+  serve: ["LISTEN", "SERVE", "SUSTAIN"],
+  advocate: ["UNDERSTAND", "AMPLIFY", "ACT"],
+  faith: ["ROOT", "RESTORE", "REACH"],
+} as const;
+
+const platformDraftStorageKey = "miss-pgws-2027-platform-generator-draft";
+
 const exampleLinks = [
   {
     title: "Past campaign video 01",
@@ -248,6 +264,12 @@ export function RoadToCrownClient({ campaignQuestion }: { campaignQuestion: stri
   const [currentVotes, setCurrentVotes] = useState(0);
   const [campaignDaysRemaining, setCampaignDaysRemaining] = useState(8);
   const [supporterGoal, setSupporterGoal] = useState(20);
+  const [platformAudience, setPlatformAudience] = useState("");
+  const [platformIssue, setPlatformIssue] = useState("");
+  const [platformWhy, setPlatformWhy] = useState("");
+  const [platformChange, setPlatformChange] = useState("");
+  const [platformApproach, setPlatformApproach] = useState<keyof typeof platformFrameworks>("educate");
+  const [platformPlan, setPlatformPlan] = useState<PlatformPlan | null>(null);
 
   useEffect(() => {
     try {
@@ -286,6 +308,53 @@ export function RoadToCrownClient({ campaignQuestion }: { campaignQuestion: stri
   function openFromMap(id: string) {
     setOpenMilestone(id);
     window.setTimeout(() => document.getElementById(`milestone-${id}`)?.scrollIntoView({ behavior: "smooth", block: "center" }), 60);
+  }
+
+  function buildPlatformPlan(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const audience = platformAudience.trim();
+    const issue = platformIssue.trim();
+    const why = platformWhy.trim();
+    const change = platformChange.trim();
+    if (!audience || !issue || !why || !change) return;
+
+    const [first, second, third] = platformFrameworks[platformApproach];
+    const plan: PlatformPlan = {
+      theme: `From ${issue} to ${change}`,
+      points: [
+        { title: first, body: `Help ${audience} name and understand ${issue} through honest stories, useful education, and faith-centered conversation.` },
+        { title: second, body: `Connect ${audience} with practical tools, mentors, and resources that move them toward ${change}.` },
+        { title: third, body: `Invite campuses, churches, families, and community partners to take action so ${change} becomes a lasting reality.` },
+      ],
+      campaignIdeas: [
+        `My Why Reel — Share how “${why}” shaped your decision to serve ${audience}.`,
+        `Platform Point 1 carousel — Teach your audience how ${issue} appears in real life and why it deserves attention.`,
+        `Sister Conversation Live — Invite another contestant to discuss faith, identity, and what ${change} could look like.`,
+        `Resource Drop — Share three practical tools, campus resources, Scriptures, or organizations that can help ${audience}.`,
+        `Community Voice — Feature a mentor, student, ministry leader, or professional connected to your platform issue.`,
+        `Take-Action Challenge — Give supporters one meaningful action they can complete and share within 24 hours.`,
+        `Progress & Gratitude Story — Celebrate the people rallying around your message without exposing private donor information.`,
+        `Final Invitation — Restate your three platform points, thank your community, and invite one final purpose-centered action.`,
+      ],
+    };
+    setPlatformPlan(plan);
+    window.setTimeout(() => document.getElementById("platform-plan-results")?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+  }
+
+  function sendPlatformPlanToStudio() {
+    if (!platformPlan) return;
+    const formatted = [
+      `PLATFORM THEME: ${platformPlan.theme}`,
+      "",
+      ...platformPlan.points.flatMap((point, index) => [
+        `PLATFORM POINT ${index + 1} — ${point.title}`,
+        point.body,
+        "",
+      ]),
+      `WHY THIS MATTERS TO ME: ${platformWhy.trim()}`,
+    ].join("\n").trim();
+    window.localStorage.setItem(platformDraftStorageKey, formatted);
+    window.location.href = "/portal/campaign#campaign-profile";
   }
 
   return (
@@ -446,7 +515,40 @@ export function RoadToCrownClient({ campaignQuestion }: { campaignQuestion: stri
             ["06", "Publish and review", "Publish your complete profile, then open the public contestant gallery and review it like a supporter."],
           ].map(([number, title, body]) => <article key={number}><span>{number}</span><div><h3>{title}</h3><p>{body}</p></div></article>)}
         </div>
-        <div className="studio-actions"><a className="button button--lipstick" href="/portal/campaign">Open my Contestant Studio</a><a className="button button--paper" href="/contestants">Preview the public contestant gallery</a></div>
+        <div className="studio-actions"><a className="button button--lipstick" href="/portal/campaign">Open my Contestant Studio</a><a className="button button--paper" href="#platform-lab">Build my platform points</a><a className="button button--paper" href="/contestants">Preview the public contestant gallery</a></div>
+      </section>
+
+      <section className="road-section platform-lab" id="platform-lab">
+        <div className="road-section__heading road-section__heading--light">
+          <div><p className="eyebrow eyebrow--light">THE PLATFORM POINTS GENERATOR</p><h2>Turn your why<br />into a platform.</h2></div>
+          <p>Answer four honest questions. The generator will shape your answers into a theme, three connected platform points, and eight campaign-week ideas. Use the result as a starting place, then rewrite it in your own voice.</p>
+        </div>
+
+        <div className="platform-builder-shell">
+          <form className="platform-builder-form" onSubmit={buildPlatformPlan}>
+            <div className="platform-builder-intro"><span>01</span><div><p className="eyebrow">YOUR CALLING</p><h3>Tell the truth before you choose the words.</h3></div></div>
+            <label><span>Who do you feel called to serve?</span><input required value={platformAudience} onChange={(event) => setPlatformAudience(event.target.value)} placeholder="Example: first-generation college women" /></label>
+            <label><span>What issue or challenge are they facing?</span><input required value={platformIssue} onChange={(event) => setPlatformIssue(event.target.value)} placeholder="Example: feeling invisible and unworthy" /></label>
+            <label><span>Why is this personal to you?</span><textarea required rows={4} value={platformWhy} onChange={(event) => setPlatformWhy(event.target.value)} placeholder="Name the experience, person, prayer, or moment that made you care." /></label>
+            <label><span>What change do you want to help create?</span><textarea required rows={3} value={platformChange} onChange={(event) => setPlatformChange(event.target.value)} placeholder="Example: confidence rooted in Christ and the courage to remain in college" /></label>
+            <label><span>How do you most naturally want to lead?</span><select value={platformApproach} onChange={(event) => setPlatformApproach(event.target.value as keyof typeof platformFrameworks)}><option value="educate">Educate and raise awareness</option><option value="mentor">Mentor and build confidence</option><option value="serve">Serve and provide resources</option><option value="advocate">Advocate and create change</option><option value="faith">Build faith and community</option></select></label>
+            <button className="button button--lipstick" type="submit">Generate my platform points</button>
+            <small>Your answers stay on this device unless you choose to send the completed draft to your Contestant Studio.</small>
+          </form>
+
+          <div className={`platform-builder-results ${platformPlan ? "platform-builder-results--ready" : ""}`} id="platform-plan-results" aria-live="polite">
+            {!platformPlan ? <div className="platform-builder-placeholder"><span aria-hidden="true">✦</span><p className="eyebrow eyebrow--light">YOUR PLATFORM COVER STORY</p><h3>Your three points will appear here.</h3><p>Strong platform points work together: one helps people understand, one gives them tools, and one invites them to act.</p></div> : <>
+              <div className="platform-theme-card"><p className="eyebrow eyebrow--light">YOUR WORKING PLATFORM THEME</p><h3>{platformPlan.theme}</h3><small>Read it aloud. Keep the meaning, then make the wording sound like you.</small></div>
+              <div className="generated-platform-points">{platformPlan.points.map((point, index) => <article key={point.title}><span>0{index + 1}</span><div><b>{point.title}</b><p>{point.body}</p></div></article>)}</div>
+              <div className="platform-results-actions"><button className="button button--paper" type="button" onClick={sendPlatformPlanToStudio}>Send this plan to my Studio</button><button className="button button--ghost" type="button" onClick={() => setPlatformPlan(null)}>Start again</button></div>
+            </>}
+          </div>
+        </div>
+
+        {platformPlan && <div className="personalized-campaign-plan">
+          <div><p className="eyebrow eyebrow--light">YOUR PERSONALIZED CAMPAIGN-WEEK IDEAS</p><h3>Eight ways to make the platform visible.</h3><p>Choose the ideas that sound like you. You do not need expensive production—clarity, consistency, and honest connection matter more.</p></div>
+          <div className="personalized-campaign-grid">{platformPlan.campaignIdeas.map((idea, index) => <article key={idea}><span>DAY {index + 1}</span><p>{idea}</p></article>)}</div>
+        </div>}
       </section>
 
       <section className="road-section road-section--paper" id="campaign-week">
@@ -627,6 +729,49 @@ export function RoadToCrownClient({ campaignQuestion }: { campaignQuestion: stri
             <small>Your official score details and released feedback appear in your contestant portal. Ms. Vincent will remain available for support and guidance throughout the experience.</small>
           </div>
         </div>
+      </section>
+
+      <section className="queen-experience-section" id="queen-experience">
+        <div className="queen-experience-header">
+          <p className="eyebrow">THE CROWN IS ONLY THE BEGINNING</p>
+          <h2>What she wins.<br /><em>What every sister carries.</em></h2>
+          <p>One woman will receive the national title—but every contestant who completes this experience leaves with recognition, documentation, a stronger platform, and a national sisterhood built around faith and service.</p>
+        </div>
+
+        <div className="queen-prize-feature">
+          <div className="queen-prize-portrait">
+            <img src="/queens/queens-pink-coronation.jpeg" alt="Pretty Girls Who Serve queens celebrating together at coronation" />
+            <div><span>MISS PRETTY GIRLS WHO SERVE 2027</span><strong>National Titleholder</strong></div>
+          </div>
+          <div className="queen-prize-copy">
+            <div className="queen-prize-crown" aria-hidden="true">♛</div>
+            <p className="eyebrow eyebrow--light">THE NATIONAL WINNER EXPERIENCE</p>
+            <h3>Crowned to represent. Chosen to serve.</h3>
+            <p>Miss Pretty Girls Who Serve becomes a national ambassador for Pretty Girls Who Serve and Esther Funds Foundation—representing a growing national organization committed to faith, sisterhood, service, scholarships, and helping college women persist.</p>
+            <div className="queen-prize-list">
+              <article><span>01</span><div><b>Official Crown, Sash & National Title</b><p>The visible symbols of a year devoted to purpose, leadership, ministry, and service.</p></div></article>
+              <article><span>02</span><div><b>$1,000–$2,500 First-Place Scholarship</b><p>10% of verified gross voting donations before processing fees, with a guaranteed $1,000 minimum and $2,500 maximum after the final audit.</p></div></article>
+              <article><span>03</span><div><b>National Representation</b><p>Opportunities to represent PGWS and Esther Funds Foundation through approved events, campaigns, service initiatives, digital features, and leadership moments.</p></div></article>
+              <article><span>04</span><div><b>Titleholder Photoshoot Support</b><p>A photoshoot stipend or approved photography support for her official titleholder images, with the final amount and arrangements confirmed in the written winner package.</p></div></article>
+              <article><span>05</span><div><b>A Foundation-Sponsored Brunch in Her Honor</b><p>One approved PGWS brunch celebrating her reign, sisterhood, and platform. The Foundation will sponsor approved event expenses within the official written budget; she will not be required to personally finance them.</p></div></article>
+              <article><span>06</span><div><b>A Year to Lead Her Platform</b><p>Support to activate an approved service initiative, share her message nationally, encourage the next contestant class, and build a legacy beyond crowning day.</p></div></article>
+            </div>
+          </div>
+        </div>
+
+        <div className="every-contestant-feature">
+          <div className="every-contestant-feature__intro"><span aria-hidden="true">✦</span><div><p className="eyebrow">EVERY CONTESTANT RECEIVES</p><h3>No sister leaves empty-handed.</h3><p>Your crown may look different, but your work will be seen, documented, and celebrated.</p></div></div>
+          <div className="every-contestant-grid">
+            <article><b>Participation Certificate</b><p>Official recognition for completing the Miss PGWS 2027 Queen Training and competition experience.</p></article>
+            <article><b>Personalized Recommendation Letter</b><p>A letter recognizing her participation, leadership, professionalism, service, and platform development.</p></article>
+            <article><b>Verified Service-Hour Letter</b><p>Official documentation of approved service hours completed and verified through the competition.</p></article>
+            <article><b>Fundraising Impact Letter</b><p>A record of her verified campaign impact and the amount her community helped raise in support of the Foundation’s mission.</p></article>
+            <article><b>National Contestant Recognition</b><p>An official contestant identity, public profile, campaign feature, and place within the 2027 national contestant class.</p></article>
+            <article><b>A Sisterhood & Platform to Keep</b><p>New sisters in Christ, greater confidence, campaign experience, and a purpose-centered platform she can continue beyond the pageant.</p></article>
+          </div>
+        </div>
+
+        <p className="queen-package-note">All awards, titleholder opportunities, support, and event expenses remain subject to final eligibility, audit, acceptance of winner obligations, approved schedules, and written competition terms.</p>
       </section>
 
       <section className="road-final-cta">
