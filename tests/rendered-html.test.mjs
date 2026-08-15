@@ -124,3 +124,9 @@ test("provides 140 Christ-centered platform starters and the 12-part confidence 
 
   assert.match(confidence, /Zoom still holds the rooms/i);
 });
+
+test("keeps the campaign clock in the page flow while contestants scroll", async () => {
+  const styles = await readFile(new URL("app/globals.css", root), "utf8");
+  assert.match(styles, /\.road-command \{ position: relative;/);
+  assert.doesNotMatch(styles, /\.road-command \{ position: sticky;/);
+});
