@@ -164,12 +164,23 @@ const campaignIdeas = [
 ];
 
 const voteTiers = [
-  { votes: 25, name: "Launch Circle", amount: 62.5, message: "Your first believers are helping the campaign move." },
-  { votes: 50, name: "Campus Rally", amount: 125, message: "Your message is reaching beyond your closest circle." },
-  { votes: 100, name: "Ruby Momentum", amount: 250, message: "One hundred acts of support can create real student impact." },
-  { votes: 250, name: "Crown Impact", amount: 625, message: "Your community is rallying around both you and the mission." },
-  { votes: 500, name: "Legacy Circle", amount: 1250, message: "Your platform has become a movement bigger than one post." },
+  { votes: 25, name: "Launch Circle", message: "Your first believers are helping the campaign move." },
+  { votes: 50, name: "Campus Rally", message: "Your message is reaching beyond your closest circle." },
+  { votes: 100, name: "Ruby Momentum", message: "One hundred acts of support can create real student impact." },
+  { votes: 250, name: "Crown Impact", message: "Your community is rallying around both you and the mission." },
+  { votes: 500, name: "Legacy Circle", message: "Your platform has become a movement bigger than one post." },
 ] as const;
+
+const voteBundles = [
+  { votes: 1, name: "One vote", amount: 2.5, note: "One supporter. One verified vote." },
+  { votes: 5, name: "High Five", amount: 12.5, note: "A simple way for one supporter to give five votes." },
+  { votes: 10, name: "Ruby Ten", amount: 25, note: "Ten votes purchased together in one checkout." },
+  { votes: 20, name: "Support Circle", amount: 50, note: "Twenty votes toward the same contestant." },
+  { votes: 50, name: "Crown Rally", amount: 125, note: "A strong group, family, church, or alumni rally." },
+  { votes: 100, name: "Legacy Push", amount: 250, note: "One hundred votes in one verified transaction." },
+] as const;
+
+const voteGoalPresets = [100, 250, 500, 750, 1000] as const;
 
 const exampleLinks = [
   {
@@ -233,7 +244,9 @@ export function RoadToCrownClient({ campaignQuestion }: { campaignQuestion: stri
   const [openMilestone, setOpenMilestone] = useState("training");
   const [now, setNow] = useState<number | null>(null);
   const [ideaIndex, setIdeaIndex] = useState(0);
-  const [voteGoal, setVoteGoal] = useState(100);
+  const [voteGoal, setVoteGoal] = useState(250);
+  const [currentVotes, setCurrentVotes] = useState(0);
+  const [campaignDaysRemaining, setCampaignDaysRemaining] = useState(8);
   const [supporterGoal, setSupporterGoal] = useState(20);
 
   useEffect(() => {
@@ -262,6 +275,9 @@ export function RoadToCrownClient({ campaignQuestion }: { campaignQuestion: stri
     [now],
   );
   const remaining = durationParts(nextEvent && now !== null ? new Date(nextEvent.at).getTime() - now : 0);
+  const votesRemaining = Math.max(0, voteGoal - currentVotes);
+  const votesPerDay = Math.ceil(votesRemaining / campaignDaysRemaining);
+  const votesPerSupporter = Math.ceil(votesRemaining / supporterGoal);
 
   function toggleComplete(id: string) {
     setCompleted((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
@@ -451,40 +467,80 @@ export function RoadToCrownClient({ campaignQuestion }: { campaignQuestion: stri
 
       <section className="road-section vote-rally-room" id="vote-rally-room">
         <div className="road-section__heading road-section__heading--light">
-          <div><p className="eyebrow eyebrow--light">THE VOTE RALLY ROOM</p><h2>Turn support<br />into impact.</h2></div>
-          <p>Every verified vote is a $2.50 donation through the official ballot. Your job is not to pressure people—it is to help your community understand your platform, the scholarship mission, and the impact they can create with you.</p>
+          <div><p className="eyebrow eyebrow--light">THE VOTE RALLY ROOM</p><h2>Give every vote<br />a clear goal.</h2></div>
+          <p>Build your plan around votes—not a dollar amount. Every completed $2.50 voting donation equals one vote after payment verification. Your job is to tell your story, invite support with integrity, and track the votes still needed to reach your personal goal.</p>
         </div>
 
         <div className="vote-fact-strip">
-          <article><strong>$2.50</strong><span>per verified vote</span></article>
-          <article><strong>LIVE</strong><span>provisional leaderboard</span></article>
-          <article><strong>100%</strong><span>purpose-driven campaigning</span></article>
-          <article><strong>ONE</strong><span>sisterhood building together</span></article>
+          <article><strong>1 = $2.50</strong><span>one paid quantity becomes one vote</span></article>
+          <article><strong>85%</strong><span>verified votes in the final score</span></article>
+          <article><strong>15%</strong><span>performance in the final score</span></article>
+          <article><strong>FINAL AUDIT</strong><span>certifies eligible votes and results</span></article>
+        </div>
+
+        <div className="vote-clarity-grid">
+          <article><span>01</span><div><h3>Choose the contestant.</h3><p>The donor opens the official ballot and confirms the correct contestant name and number before paying.</p></div></article>
+          <article><span>02</span><div><h3>Choose the vote quantity.</h3><p>One vote is $2.50. A quantity of 10 means 10 votes and a $25 voting donation. Bundles are quantity examples, not discounted votes.</p></div></article>
+          <article><span>03</span><div><h3>Complete one secure checkout.</h3><p>The donor enters a working email address so the payment processor can send the receipt and confirmation details.</p></div></article>
+          <article><span>04</span><div><h3>Wait for verification.</h3><p>Eligible completed payments are added to the provisional total. Failed, refunded, disputed, duplicate, fraudulent, voided, or late payments do not count.</p></div></article>
         </div>
 
         <div className="vote-goal-lab">
           <div className="vote-goal-lab__controls">
-            <p className="eyebrow">BUILD YOUR PERSONAL RALLY PLAN</p>
-            <h3>A goal becomes possible when you can see the people inside it.</h3>
+            <p className="eyebrow">BUILD YOUR PERSONAL VOTE PLAN</p>
+            <h3>Set a vote goal. Then turn it into a daily plan.</h3>
             <label>
               <span><b>Vote goal</b><output>{voteGoal.toLocaleString()} votes</output></span>
-              <input type="range" min="25" max="1000" step="25" value={voteGoal} onChange={(event) => setVoteGoal(Number(event.target.value))} />
+              <input aria-label="Personal vote goal" type="range" min="25" max="1500" step="25" value={voteGoal} onChange={(event) => {
+                const goal = Number(event.target.value);
+                setVoteGoal(goal);
+                setCurrentVotes((current) => Math.min(current, goal));
+              }} />
             </label>
             <label>
-              <span><b>Support team size</b><output>{supporterGoal} people</output></span>
-              <input type="range" min="5" max="100" step="5" value={supporterGoal} onChange={(event) => setSupporterGoal(Number(event.target.value))} />
+              <span><b>Votes already earned</b><output>{currentVotes.toLocaleString()} votes</output></span>
+              <input aria-label="Votes already earned" type="range" min="0" max={voteGoal} step="1" value={currentVotes} onChange={(event) => setCurrentVotes(Number(event.target.value))} />
+            </label>
+            <label>
+              <span><b>Campaign days remaining</b><output>{campaignDaysRemaining} days</output></span>
+              <input aria-label="Campaign days remaining" type="range" min="1" max="8" step="1" value={campaignDaysRemaining} onChange={(event) => setCampaignDaysRemaining(Number(event.target.value))} />
+            </label>
+            <label>
+              <span><b>Support team</b><output>{supporterGoal} people</output></span>
+              <input aria-label="Support team size" type="range" min="5" max="100" step="5" value={supporterGoal} onChange={(event) => setSupporterGoal(Number(event.target.value))} />
             </label>
             <div className="vote-goal-presets">
-              {voteTiers.map((tier) => <button key={tier.votes} type="button" onClick={() => setVoteGoal(tier.votes)}>{tier.votes} votes</button>)}
+              {voteGoalPresets.map((votes) => <button key={votes} type="button" onClick={() => {
+                setVoteGoal(votes);
+                setCurrentVotes((current) => Math.min(current, votes));
+              }}>{votes.toLocaleString()}-vote goal</button>)}
             </div>
           </div>
           <div className="vote-goal-lab__result" aria-live="polite">
-            <span>YOUR RALLY PLAN</span>
-            <strong>${(voteGoal * 2.5).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
-            <p>in potential scholarship and student-support fundraising</p>
-            <div><b>{Math.ceil(voteGoal / supporterGoal)}</b><span>average votes per support-team member to reach {voteGoal.toLocaleString()}</span></div>
-            <small>This is a planning tool, not a prediction or an official placement level.</small>
+            <span>VOTES STILL NEEDED</span>
+            <strong>{votesRemaining.toLocaleString()}</strong>
+            <p>to reach your personal goal of {voteGoal.toLocaleString()} verified votes</p>
+            <div><b>{votesPerDay}</b><span>votes per day for the next {campaignDaysRemaining} {campaignDaysRemaining === 1 ? "day" : "days"}</span></div>
+            <div><b>{votesPerSupporter}</b><span>votes per person if your {supporterGoal}-person support team shares the goal</span></div>
+            <small>Your goal is motivational and personal. It is not an official placement tier, score promise, or guarantee of winning.</small>
           </div>
+        </div>
+
+        <div className="vote-bundle-section">
+          <div className="vote-tier-heading">
+            <div><p className="eyebrow eyebrow--light">VOTE BUNDLES EXPLAINED</p><h3>Quantity made simple.</h3></div>
+            <p>A bundle is simply several $2.50 votes for the same contestant in one checkout. There is no discount and no special scoring bonus—the selected quantity is the number of eligible votes.</p>
+          </div>
+          <div className="vote-bundles">
+            {voteBundles.map((bundle) => <article key={bundle.votes}>
+              <span>{bundle.name}</span>
+              <strong>{bundle.votes} {bundle.votes === 1 ? "VOTE" : "VOTES"}</strong>
+              <b>${bundle.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</b>
+              <p>{bundle.note}</p>
+            </article>)}
+          </div>
+          <div className="vote-bundle-note"><b>Example:</b> If one donor chooses 20 votes and another chooses 5 votes for you, your campaign receives 25 eligible votes after both payments are verified.</div>
+          <div className="vote-bundle-actions"><a className="button button--lipstick" href="/vote">Open the official ballot</a><a className="button button--paper" href="/leaderboard">View verified vote totals</a></div>
         </div>
 
         <div className="vote-tier-heading">
@@ -496,7 +552,7 @@ export function RoadToCrownClient({ campaignQuestion }: { campaignQuestion: stri
             <span>0{index + 1}</span>
             <b>{tier.votes} VOTES</b>
             <h3>{tier.name}</h3>
-            <strong>${tier.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
+            <strong>{Math.ceil(tier.votes / 8)} votes/day</strong>
             <p>{tier.message}</p>
           </article>)}
         </div>
@@ -520,6 +576,37 @@ export function RoadToCrownClient({ campaignQuestion }: { campaignQuestion: stri
             <div><span>Swap honest feedback</span><span>Plan a joint Live</span><span>Share filming tips</span><span>Pray for one another</span><span>Celebrate every win</span><span>Ask Ms. Vincent for guidance</span></div>
             <blockquote>“Your sister’s light does not dim yours. Help her shine.”</blockquote>
           </article>
+        </div>
+
+        <div className="donor-relationship-section">
+          <div className="vote-tier-heading">
+            <div><p className="eyebrow eyebrow--light">DONOR RELATIONSHIPS</p><h3>Honor the person behind every vote.</h3></div>
+            <p>A donor is more than a number on the leaderboard. Build trust before the gift, protect their information during checkout, and continue the relationship with sincere gratitude afterward.</p>
+          </div>
+          <div className="donor-relationship-grid">
+            <article><span>BEFORE</span><h3>Invite with purpose.</h3><ul><li>Tell them who you are and what your platform means.</li><li>Explain what their voting donation supports.</li><li>Share only the official ballot link.</li><li>Never pressure, shame, or promise an outcome.</li></ul></article>
+            <article><span>DURING</span><h3>Protect the donor.</h3><ul><li>Let the donor complete the secure checkout personally.</li><li>Never collect card information or voting money yourself.</li><li>Confirm the contestant name and vote quantity before payment.</li><li>Keep donor names, emails, amounts, and receipts private.</li></ul></article>
+            <article><span>AFTER</span><h3>Lead with gratitude.</h3><ul><li>Send a personal thank-you as soon as possible.</li><li>Do not publicly share a donor or amount without permission.</li><li>Update supporters on your platform and the impact created.</li><li>Stay connected after campaign week ends.</li></ul></article>
+          </div>
+        </div>
+
+        <div className="vote-support-desk">
+          <div className="vote-support-desk__copy">
+            <p className="eyebrow">RECEIPTS & VOTE CONFIRMATION</p>
+            <h3>Every donor should keep the receipt.</h3>
+            <p>A receipt is sent to the email address entered during checkout. Donors should check Spam and Promotions and keep the receipt or transaction number. Esther Funds Foundation is a federally recognized 501(c)(3), and voting donations are tax-deductible to the extent allowed by law. Donors should retain the receipt for their records.</p>
+            <p>If a donor needs help confirming whether a vote was received, email <a href="mailto:nationals@estherfundsinc.org">nationals@estherfundsinc.org</a>. The Foundation will review the payment record and respond as promptly as possible.</p>
+            <a className="button button--lipstick" href="mailto:nationals@estherfundsinc.org?subject=Miss%20PGWS%202027%20vote%20confirmation%20request&amp;body=Donor%20name%3A%0AEmail%20used%20at%20checkout%3A%0AContestant%20name%20and%20number%3A%0ADate%20and%20approximate%20time%3A%0AVote%20quantity%20and%20amount%3A%0AReceipt%20or%20transaction%20number%3A%0A%0APlease%20do%20not%20include%20a%20full%20card%20number.">Email the Vote Support Desk</a>
+          </div>
+          <div className="vote-support-desk__checklist">
+            <p className="eyebrow">INCLUDE THESE DETAILS</p>
+            <span><b>01</b> Donor name</span>
+            <span><b>02</b> Email used at checkout</span>
+            <span><b>03</b> Contestant name and number</span>
+            <span><b>04</b> Date, approximate time, and vote quantity</span>
+            <span><b>05</b> Receipt or transaction number</span>
+            <small>For security, never email a full card number, bank details, password, or an unredacted image showing sensitive payment information.</small>
+          </div>
         </div>
 
         <div className="leaderboard-guidance">

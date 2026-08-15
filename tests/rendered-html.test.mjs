@@ -54,3 +54,21 @@ test("includes the application shell and supplied brand assets", async () => {
 
   await Promise.all(requiredPaths.map((file) => access(new URL(file, root))));
 });
+
+test("includes the complete vote education and donor support experience", async () => {
+  const source = await readFile(
+    new URL("app/road-to-the-crown/RoadToCrownClient.tsx", root),
+    "utf8",
+  );
+
+  for (const requiredCopy of [
+    "VOTES STILL NEEDED",
+    "VOTE BUNDLES EXPLAINED",
+    "DONOR RELATIONSHIPS",
+    "RECEIPTS & VOTE CONFIRMATION",
+    "nationals@estherfundsinc.org",
+    "tax-deductible to the extent allowed by law",
+  ]) {
+    assert.match(source, new RegExp(requiredCopy.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+});
