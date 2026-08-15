@@ -130,3 +130,20 @@ test("keeps the campaign clock in the page flow while contestants scroll", async
   assert.match(styles, /\.road-command \{ position: relative;/);
   assert.doesNotMatch(styles, /\.road-command \{ position: sticky;/);
 });
+
+test("introduces Shayna Vincent as the host, founder, educator, and sisterhood guide", async () => {
+  const page = await readFile(new URL("app/road-to-the-crown/page.tsx", root), "utf8");
+  await access(new URL("public/shayna-vincent-founder.jpg", root));
+
+  for (const requiredCopy of [
+    "I’ll be your host!",
+    "Founder & Chief Executive Officer",
+    "Founder of Pretty Girls Who Serve",
+    "Florida A&M University Graduate",
+    "Sigma Gamma Rho Woman",
+    "did not know what a Proverbs 31 woman was until God revealed her to me at age 23",
+    "This sisterhood does not end when the crown is placed",
+  ]) {
+    assert.match(page, new RegExp(requiredCopy.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+});
