@@ -2,6 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties, FormEvent } from "react";
+import { confidenceWalkthrough } from "./confidenceWalkthrough";
+import {
+  CHRIST_CENTERED_PLATFORM_IDEA_COUNT,
+  christCenteredPlatformIdeas,
+  platformIdeaCategories,
+} from "./christCenteredPlatformIdeas";
 
 type Milestone = {
   id: string;
@@ -197,6 +203,7 @@ const platformFrameworks = {
 } as const;
 
 const platformDraftStorageKey = "miss-pgws-2027-platform-generator-draft";
+const confidenceNotesStorageKey = "miss-pgws-2027-confidence-walkthrough-notes";
 
 const exampleLinks = [
   {
@@ -270,6 +277,12 @@ export function RoadToCrownClient({ campaignQuestion }: { campaignQuestion: stri
   const [platformChange, setPlatformChange] = useState("");
   const [platformApproach, setPlatformApproach] = useState<keyof typeof platformFrameworks>("educate");
   const [platformPlan, setPlatformPlan] = useState<PlatformPlan | null>(null);
+  const [platformIdeaCategory, setPlatformIdeaCategory] = useState("identity");
+  const [platformIdeaSeed, setPlatformIdeaSeed] = useState(0);
+  const [confidenceStep, setConfidenceStep] = useState(0);
+  const [confidenceNotes, setConfidenceNotes] = useState<Record<string, string>>({});
+  const [breakoutSeconds, setBreakoutSeconds] = useState(7 * 60);
+  const [breakoutRunning, setBreakoutRunning] = useState(false);
 
   useEffect(() => {
     try {
@@ -280,6 +293,33 @@ export function RoadToCrownClient({ campaignQuestion }: { campaignQuestion: stri
     }
     setHydrated(true);
   }, []);
+
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(confidenceNotesStorageKey) || "{}");
+      if (saved && typeof saved === "object" && !Array.isArray(saved)) setConfidenceNotes(saved);
+    } catch {
+      setConfidenceNotes({});
+    }
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem(confidenceNotesStorageKey, JSON.stringify(confidenceNotes));
+  }, [confidenceNotes]);
+
+  useEffect(() => {
+    if (!breakoutRunning) return;
+    const timer = window.setInterval(() => {
+      setBreakoutSeconds((current) => {
+        if (current <= 1) {
+          setBreakoutRunning(false);
+          return 0;
+        }
+        return current - 1;
+      });
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [breakoutRunning]);
 
   useEffect(() => {
     if (hydrated) window.localStorage.setItem(storageKey, JSON.stringify(completed));
@@ -300,6 +340,19 @@ export function RoadToCrownClient({ campaignQuestion }: { campaignQuestion: stri
   const votesRemaining = Math.max(0, voteGoal - currentVotes);
   const votesPerDay = Math.ceil(votesRemaining / campaignDaysRemaining);
   const votesPerSupporter = Math.ceil(votesRemaining / supporterGoal);
+  const platformIdeaPool = useMemo(
+    () => christCenteredPlatformIdeas.filter((idea) => idea.categoryKey === platformIdeaCategory),
+    [platformIdeaCategory],
+  );
+  const selectedChristIdeas = useMemo(() => {
+    const count = platformIdeaPool.length;
+    if (!count) return [];
+    const start = (platformIdeaSeed * 3) % count;
+    return [0, 1, 2].map((offset) => platformIdeaPool[(start + offset) % count]);
+  }, [platformIdeaPool, platformIdeaSeed]);
+  const activeConfidenceStep = confidenceWalkthrough[confidenceStep];
+  const breakoutMinutes = Math.floor(breakoutSeconds / 60);
+  const breakoutRemainder = String(breakoutSeconds % 60).padStart(2, "0");
 
   function toggleComplete(id: string) {
     setCompleted((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
@@ -318,14 +371,13 @@ export function RoadToCrownClient({ campaignQuestion }: { campaignQuestion: stri
     const change = platformChange.trim();
     if (!audience || !issue || !why || !change) return;
 
-    const [first, second, third] = platformFrameworks[platformApproach];
+    const approach = platformApproach === "educate" ? "education" : platformApproach === "mentor" ? "mentorship" : platformApproach === "serve" ? "service" : platformApproach === "advocate" ? "advocacy" : "faith-building";
     const plan: PlatformPlan = {
       theme: `From ${issue} to ${change}`,
-      points: [
-        { title: first, body: `Help ${audience} name and understand ${issue} through honest stories, useful education, and faith-centered conversation.` },
-        { title: second, body: `Connect ${audience} with practical tools, mentors, and resources that move them toward ${change}.` },
-        { title: third, body: `Invite campuses, churches, families, and community partners to take action so ${change} becomes a lasting reality.` },
-      ],
+      points: selectedChristIdeas.map((idea) => ({
+        title: idea.title,
+        body: `${idea.statement} Make this personal through ${approach} that helps ${audience} move beyond ${issue} toward ${change}.`,
+      })),
       campaignIdeas: [
         `My Why Reel — Share how “${why}” shaped your decision to serve ${audience}.`,
         `Platform Point 1 carousel — Teach your audience how ${issue} appears in real life and why it deserves attention.`,
@@ -355,6 +407,18 @@ export function RoadToCrownClient({ campaignQuestion }: { campaignQuestion: stri
     ].join("\n").trim();
     window.localStorage.setItem(platformDraftStorageKey, formatted);
     window.location.href = "/portal/campaign#campaign-profile";
+  }
+
+  function openConfidenceStep(index: number) {
+    const next = Math.max(0, Math.min(confidenceWalkthrough.length - 1, index));
+    setConfidenceStep(next);
+    if (confidenceWalkthrough[next].mode !== "breakout") setBreakoutRunning(false);
+    window.setTimeout(() => document.getElementById("confidence-stage")?.scrollIntoView({ behavior: "smooth", block: "start" }), 40);
+  }
+
+  function resetBreakoutTimer() {
+    setBreakoutRunning(false);
+    setBreakoutSeconds(7 * 60);
   }
 
   return (
@@ -500,6 +564,40 @@ export function RoadToCrownClient({ campaignQuestion }: { campaignQuestion: stri
         </div>
       </section>
 
+      <section className="road-section confidence-experience" id="confidence-walkthrough">
+        <div className="road-section__heading road-section__heading--light">
+          <div><p className="eyebrow eyebrow--light">CONFIDENCE & PLATFORM EXPERIENCE</p><h2>Rooted before<br />she is crowned.</h2></div>
+          <p>This guided website experience replaces the confidence slides. Ms. Vincent can move through each mini-lesson, pause for private reflection, invite chat engagement, and still send contestants into Zoom breakout rooms for live practice.</p>
+        </div>
+
+        <nav className="confidence-step-nav" aria-label="Confidence walkthrough steps">{confidenceWalkthrough.map((step, index) => <button key={step.number} className={confidenceStep === index ? "confidence-step-nav__active" : ""} type="button" onClick={() => openConfidenceStep(index)} aria-current={confidenceStep === index ? "step" : undefined}><span>{step.number}</span><b>{step.label}</b></button>)}</nav>
+
+        <div className={`confidence-stage confidence-stage--${activeConfidenceStep.mode}`} id="confidence-stage">
+          <div className="confidence-stage__chapter">
+            <span>{activeConfidenceStep.number}</span>
+            <p>{activeConfidenceStep.label}</p>
+            <small>{activeConfidenceStep.mode === "breakout" ? "LIVE SISTER PRACTICE" : activeConfidenceStep.mode === "reflect" ? "PRIVATE MIRROR MOMENT" : activeConfidenceStep.mode === "share" ? "RETURN & AFFIRM" : "GUIDED MINI-LESSON"}</small>
+          </div>
+          <div className="confidence-stage__lesson">
+            <p className="eyebrow">CONFIDENCE & PLATFORM LAB</p>
+            <h3>{activeConfidenceStep.title}</h3>
+            <p className="confidence-stage__subtitle">{activeConfidenceStep.subtitle}</p>
+            <div className="confidence-teaching-list">{activeConfidenceStep.teaching.map((item, index) => <div key={item}><span>0{index + 1}</span><p>{item}</p></div>)}</div>
+            {activeConfidenceStep.callout && <blockquote>{activeConfidenceStep.callout}</blockquote>}
+          </div>
+          <div className="confidence-stage__activity">
+            <div className="facilitator-cue"><span>MS. VINCENT’S CUE</span><p>{activeConfidenceStep.facilitatorCue}</p></div>
+            {activeConfidenceStep.prompt && <label className="confidence-private-note"><span>MY PRIVATE NOTE</span><textarea rows={5} value={confidenceNotes[activeConfidenceStep.number] || ""} onChange={(event) => setConfidenceNotes((current) => ({ ...current, [activeConfidenceStep.number]: event.target.value }))} placeholder={activeConfidenceStep.prompt} /><small>Saved only on this device. Share only what feels safe.</small></label>}
+            {activeConfidenceStep.mode === "breakout" && <div className="breakout-control-room">
+              <div><p className="eyebrow eyebrow--light">ZOOM BREAKOUT TIMER</p><strong>{breakoutMinutes}:{breakoutRemainder}</strong><span>{breakoutSeconds === 0 ? "Welcome the queens back." : breakoutRunning ? "Breakout rooms are practicing." : "Ready for pairs or groups of three."}</span></div>
+              <div><button className="button button--paper" type="button" disabled={breakoutSeconds === 0} onClick={() => setBreakoutRunning((current) => !current)}>{breakoutRunning ? "Pause timer" : "Start 7-minute timer"}</button><button className="button button--ghost" type="button" onClick={resetBreakoutTimer}>Reset</button></div>
+              <p><b>Round 1:</b> introduction with notes and sister feedback. <b>Round 2:</b> repeat with fewer notes and more natural connection. Broadcast a two-minute warning before closing the rooms.</p>
+            </div>}
+            <div className="confidence-stage__actions"><button className="button button--paper" type="button" disabled={confidenceStep === 0} onClick={() => openConfidenceStep(confidenceStep - 1)}>Previous</button><span>STEP {confidenceStep + 1} OF {confidenceWalkthrough.length}</span><button className="button button--lipstick" type="button" disabled={confidenceStep === confidenceWalkthrough.length - 1} onClick={() => openConfidenceStep(confidenceStep + 1)}>Next experience</button></div>
+          </div>
+        </div>
+      </section>
+
       <section className="road-section road-section--studio" id="contestant-studio">
         <div className="road-section__heading">
           <div><p className="eyebrow">CONTESTANT STUDIO WALKTHROUGH</p><h2>Your public<br />cover story.</h2></div>
@@ -531,6 +629,7 @@ export function RoadToCrownClient({ campaignQuestion }: { campaignQuestion: stri
             <label><span>What issue or challenge are they facing?</span><input required value={platformIssue} onChange={(event) => setPlatformIssue(event.target.value)} placeholder="Example: feeling invisible and unworthy" /></label>
             <label><span>Why is this personal to you?</span><textarea required rows={4} value={platformWhy} onChange={(event) => setPlatformWhy(event.target.value)} placeholder="Name the experience, person, prayer, or moment that made you care." /></label>
             <label><span>What change do you want to help create?</span><textarea required rows={3} value={platformChange} onChange={(event) => setPlatformChange(event.target.value)} placeholder="Example: confidence rooted in Christ and the courage to remain in college" /></label>
+            <label><span>Which Christ-centered focus best fits your calling?</span><select value={platformIdeaCategory} onChange={(event) => { setPlatformIdeaCategory(event.target.value); setPlatformIdeaSeed(0); }}>{platformIdeaCategories.map((category) => <option key={category.key} value={category.key}>{category.category} · {category.scripture}</option>)}</select></label>
             <label><span>How do you most naturally want to lead?</span><select value={platformApproach} onChange={(event) => setPlatformApproach(event.target.value as keyof typeof platformFrameworks)}><option value="educate">Educate and raise awareness</option><option value="mentor">Mentor and build confidence</option><option value="serve">Serve and provide resources</option><option value="advocate">Advocate and create change</option><option value="faith">Build faith and community</option></select></label>
             <button className="button button--lipstick" type="submit">Generate my platform points</button>
             <small>Your answers stay on this device unless you choose to send the completed draft to your Contestant Studio.</small>
@@ -543,6 +642,13 @@ export function RoadToCrownClient({ campaignQuestion }: { campaignQuestion: stri
               <div className="platform-results-actions"><button className="button button--paper" type="button" onClick={sendPlatformPlanToStudio}>Send this plan to my Studio</button><button className="button button--ghost" type="button" onClick={() => setPlatformPlan(null)}>Start again</button></div>
             </>}
           </div>
+        </div>
+
+        <div className="christ-platform-bank">
+          <div className="christ-platform-bank__heading"><div><p className="eyebrow eyebrow--light">THE 140-POINT CHRIST-CENTERED IDEA BANK</p><h3>Fourteen callings.<br />One hundred forty ways to serve.</h3></div><div><strong>{CHRIST_CENTERED_PLATFORM_IDEA_COUNT}</strong><span>distinct platform-point starters</span></div></div>
+          <div className="christ-platform-bank__controls"><label><span>Choose a focus</span><select value={platformIdeaCategory} onChange={(event) => { setPlatformIdeaCategory(event.target.value); setPlatformIdeaSeed(0); }}>{platformIdeaCategories.map((category) => <option key={category.key} value={category.key}>{category.category} · {category.scripture}</option>)}</select></label><button className="button button--paper" type="button" onClick={() => setPlatformIdeaSeed((current) => current + 1)}>Generate three different points</button></div>
+          <div className="christ-platform-ideas" aria-live="polite">{selectedChristIdeas.map((idea) => <article key={`${idea.id}-${platformIdeaSeed}`}><span>IDEA {String(idea.id).padStart(3, "0")}</span><small>{idea.category} · {idea.scripture}</small><h4>{idea.title}</h4><p>{idea.statement}</p></article>)}</div>
+          <p className="christ-platform-bank__note">These are Christ-centered starting points—not scripts. Contestants should connect the idea to their lived experience, name the community they will serve, and rewrite the language in their own voice.</p>
         </div>
 
         {platformPlan && <div className="personalized-campaign-plan">

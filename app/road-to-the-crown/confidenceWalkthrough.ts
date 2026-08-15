@@ -1,0 +1,137 @@
+export type ConfidenceStep = {
+  number: string;
+  mode: "teach" | "reflect" | "practice" | "breakout" | "share";
+  label: string;
+  title: string;
+  subtitle: string;
+  teaching: string[];
+  prompt?: string;
+  callout?: string;
+  facilitatorCue: string;
+};
+
+export const confidenceWalkthrough: ConfidenceStep[] = [
+  {
+    number: "01",
+    mode: "teach",
+    label: "FOUNDATION",
+    title: "Confidence has a foundation.",
+    subtitle: "The crown does not create confidence.",
+    teaching: ["Know who you are and Whose you are.", "Know what you believe.", "Know why your voice matters.", "Know who you have been called to serve."],
+    callout: "You do not need to become another contestant. You need the courage to become more fully yourself.",
+    facilitatorCue: "Pause and remind the room that confidence begins in Christ—not appearance, applause, ranking, or a title.",
+  },
+  {
+    number: "02",
+    mode: "reflect",
+    label: "HONESTY",
+    title: "Queens, let’s name the fear.",
+    subtitle: "Confidence begins with honesty.",
+    teaching: ["What if everyone is more polished than me?", "What if people judge my appearance?", "What if I forget what I want to say?", "What if no one supports my campaign?", "What if I am not confident enough?", "What if I do not win?"],
+    prompt: "The part of this journey that makes me most nervous is…",
+    facilitatorCue: "Invite everyone to finish the sentence privately first. Then ask willing contestants to place only what they feel safe sharing in the chat.",
+  },
+  {
+    number: "03",
+    mode: "practice",
+    label: "COURAGE",
+    title: "Fear does not get the final word.",
+    subtitle: "Confidence is taking the next brave step anyway.",
+    teaching: ["Name the fear.", "Find the lie hiding beneath it.", "Speak a truth rooted in God’s Word.", "Choose one brave action and move."],
+    prompt: "Write one fear, the lie beneath it, the truth you will answer with, and the next brave action you can take.",
+    callout: "Nervous does not mean unready.",
+    facilitatorCue: "Model one example: ‘I have to be perfect’ becomes ‘I only have to be prepared, present, and authentic.’",
+  },
+  {
+    number: "04",
+    mode: "reflect",
+    label: "PURPOSE",
+    title: "Your why builds confidence.",
+    subtitle: "Meaning gives your voice something to stand on.",
+    teaching: ["What experience has shaped you?", "What issue moves your heart?", "Who do you feel called to help?", "What do you wish someone had taught you earlier?", "What change do you want your voice to create?"],
+    prompt: "If the crown disappeared, what work would I still care about—and why?",
+    facilitatorCue: "Give the room quiet writing time. Confidence grows when the contestant knows the message matters even without the crown.",
+  },
+  {
+    number: "05",
+    mode: "practice",
+    label: "PERSONAL PLATFORM",
+    title: "Build your personal platform.",
+    subtitle: "Make the shared mission personally meaningful.",
+    teaching: ["The New Beauty Issue is the shared Miss PGWS platform.", "Your personal platform is the cause, message, or community you will champion within that mission.", "Start with your heart—not a catchy slogan."],
+    prompt: "My platform is… This matters to me because… I want to help… I want them to understand… I will create change by…",
+    facilitatorCue: "Let contestants draft imperfectly. The goal here is truth and direction, not polished wording.",
+  },
+  {
+    number: "06",
+    mode: "practice",
+    label: "THEME",
+    title: "Choose a theme that sounds like you.",
+    subtitle: "Personal. Memorable. Easy to explain.",
+    teaching: ["Connect it to your real story.", "Keep it focused on service.", "Choose something you would care about after the pageant.", "Examples: Seen, Known & Enough; Beauty Beyond Comparison; Crowned With Courage; Faith Over Fear; Her Story Has Purpose; From Silence to Strength."],
+    prompt: "Write three possible themes. Circle the one that sounds most like your heart—not merely the one that sounds impressive.",
+    facilitatorCue: "Ask two volunteers to read their three options and let the group name which one feels clearest and most authentic.",
+  },
+  {
+    number: "07",
+    mode: "practice",
+    label: "THREE POINTS",
+    title: "Build three platform points.",
+    subtitle: "Three ideas you will teach, discuss, and demonstrate.",
+    teaching: ["TRUTH — What should women understand?", "CHALLENGE — What lie, barrier, or behavior needs to change?", "ACTION — What can people actually do?"],
+    prompt: "My platform is… I created it because… My three points are…",
+    callout: "Clear. Personal. Memorable. Actionable.",
+    facilitatorCue: "Open the 140-point Christ-centered generator below if anyone needs inspiration, then help her make the language personal.",
+  },
+  {
+    number: "08",
+    mode: "teach",
+    label: "EXAMPLE",
+    title: "Example: Seen, Known & Enough.",
+    subtitle: "One personal story becomes three service pillars.",
+    teaching: ["IDENTITY — Separate worth from appearance and approval.", "DIGITAL WELLNESS — Build healthy social-media habits.", "SISTERHOOD — Affirm instead of competing.", "Service ideas: campus confidence workshops, mirror-affirmation cards, social-media wellness challenges, and sisterhood circles."],
+    callout: "A strong platform moves from personal story to shared truth to visible service.",
+    facilitatorCue: "Ask the group to identify the truth, challenge, and action in this example before moving forward.",
+  },
+  {
+    number: "09",
+    mode: "reflect",
+    label: "BOUNDARIES",
+    title: "Make it personal—without performing your pain.",
+    subtitle: "Vulnerability should create ministry, not pressure.",
+    teaching: ["You can share what you learned, how you grew, what God showed you, why the issue matters, and how you want to help.", "You may keep private details that are still painful, another person’s private story, anything you are not ready to discuss, and anything you feel pressured to reveal."],
+    prompt: "What part of my story feels ready to serve others? What part still belongs in a private, protected space?",
+    callout: "You can be real without revealing everything. Your story belongs to you.",
+    facilitatorCue: "Say this clearly: no contestant must disclose trauma to be powerful, authentic, spiritual, or competitive.",
+  },
+  {
+    number: "10",
+    mode: "practice",
+    label: "YOUR VOICE",
+    title: "Use your voice.",
+    subtitle: "You do not need a ‘pageant voice.’",
+    teaching: ["Speak clearly. Speak honestly. Speak like yourself.", "Hi, I’m [NAME], Contestant #[NUMBER], representing [UNIVERSITY].", "My platform is [THEME]. This matters to me because [WHY].", "I want to help [AUDIENCE] understand [MESSAGE].", "My three platform points are [ONE], [TWO], and [THREE].", "I want every woman to know [CLOSING TRUTH]."],
+    prompt: "Draft your natural 30-second platform introduction. Read it aloud once before the breakout room.",
+    callout: "Clarity. Connection. Courage.",
+    facilitatorCue: "Give contestants quiet practice time, then invite everyone to sit tall, breathe, slow down, and say the first sentence together.",
+  },
+  {
+    number: "11",
+    mode: "breakout",
+    label: "BREAKOUT ROOMS",
+    title: "Practice with one pretty sister.",
+    subtitle: "The website guides the practice; Zoom still holds the rooms.",
+    teaching: ["ROUND ONE — Share your introduction using your notes.", "Your sister identifies your strongest sentence.", "She asks one thoughtful follow-up question.", "ROUND TWO — Try it again with fewer notes.", "Speak naturally and let your personality come through.", "Sister feedback: ‘The message I will remember is…’ and ‘Your voice was strongest when…’"],
+    facilitatorCue: "Place contestants in pairs or groups of three. Start the seven-minute timer, open the breakout rooms, and broadcast a two-minute warning before closing them.",
+  },
+  {
+    number: "12",
+    mode: "share",
+    label: "WELCOME BACK",
+    title: "Welcome back, queens!",
+    subtitle: "A few volunteers will share their platform introductions.",
+    teaching: ["After each contestant speaks, respond in the chat with one word describing her message.", "Name the platform point you remembered.", "Offer one specific encouraging statement.", "Do not compare presentations. Help every sister discover the power of her own voice."],
+    prompt: "The sister I want to encourage is… The strength I heard in her voice was…",
+    facilitatorCue: "Invite three to five volunteers. Protect the pace, celebrate growth, and close by affirming that every voice can serve God’s purpose.",
+  },
+];

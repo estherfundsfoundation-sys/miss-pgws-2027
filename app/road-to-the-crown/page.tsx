@@ -25,6 +25,7 @@ export default function RoadToTheCrownPage() {
           </p>
           <div className="hero-actions">
             <a className="button button--lipstick" href="#guided-roadmap">Start the guided walkthrough</a>
+            <a className="button button--paper" href="#confidence-walkthrough">Open Confidence Lab</a>
             <a className="button button--paper" href="/portal/campaign">Open my Contestant Studio</a>
           </div>
         </div>

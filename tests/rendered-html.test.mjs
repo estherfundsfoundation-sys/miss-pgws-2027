@@ -101,3 +101,26 @@ test("includes the Studio finish state and connected platform generator", async 
     assert.match(roadmap, new RegExp(requiredCopy.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
 });
+
+test("provides 140 Christ-centered platform starters and the 12-part confidence walkthrough", async () => {
+  const [ideas, confidence, roadmap] = await Promise.all([
+    readFile(new URL("app/road-to-the-crown/christCenteredPlatformIdeas.ts", root), "utf8"),
+    readFile(new URL("app/road-to-the-crown/confidenceWalkthrough.ts", root), "utf8"),
+    readFile(new URL("app/road-to-the-crown/RoadToCrownClient.tsx", root), "utf8"),
+  ]);
+
+  assert.equal((ideas.match(/\{ key: "/g) || []).length, 14);
+  assert.equal((ideas.match(/\{ title: "/g) || []).length, 10);
+  assert.match(ideas, /CHRIST_CENTERED_PLATFORM_IDEA_COUNT = 140/);
+  assert.equal((confidence.match(/number: "\d\d"/g) || []).length, 12);
+
+  for (const requiredCopy of [
+    "THE 140-POINT CHRIST-CENTERED IDEA BANK",
+    "CONFIDENCE & PLATFORM EXPERIENCE",
+    "Start 7-minute timer",
+  ]) {
+    assert.match(roadmap, new RegExp(requiredCopy.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+
+  assert.match(confidence, /Zoom still holds the rooms/i);
+});
