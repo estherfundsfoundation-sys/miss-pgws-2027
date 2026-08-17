@@ -248,6 +248,45 @@ img { display: block; max-width: 100%; }
 .leader-votes { text-align: right; }
 .leader-votes strong { display: block; font-size: 24px; }
 
+/* Official Miss PGWS live leaderboard */
+.leaderboard-hero { position: relative; overflow: hidden; min-height: 650px; display: grid; grid-template-columns: 1.2fr .8fr; align-items: center; padding: clamp(70px,9vw,140px) clamp(22px,7vw,110px); color: white; background: radial-gradient(circle at 12% 13%,rgba(255,255,255,.14),transparent 25%),linear-gradient(130deg,rgba(37,10,22,.93),rgba(113,22,57,.89)),url('/brand/new-beauty-issue-cover.png') center/cover; }
+.leaderboard-hero::before { content:""; position:absolute; inset:22px; border:1px solid rgba(255,255,255,.2); pointer-events:none; }
+.leaderboard-hero__copy { position:relative; z-index:1; max-width:850px; }
+.leaderboard-hero h1 { max-width:860px; margin:0; font-family:var(--display); font-size:clamp(70px,9vw,136px); font-weight:400; line-height:.78; letter-spacing:-.06em; }
+.leaderboard-hero h1 em { display:block; margin-left:clamp(0px,6vw,90px); color:var(--pink); font-weight:400; }
+.leaderboard-hero__copy>p:not(.eyebrow) { max-width:720px; margin:30px 0; color:#f4e8ed; font-size:17px; line-height:1.75; }
+.leaderboard-hero__brand { position:relative; z-index:1; justify-self:end; width:min(100%,480px); padding:32px; border-radius:50%; background:rgba(255,255,255,.93); box-shadow:0 30px 90px rgba(0,0,0,.3); }
+.leaderboard-status { max-width:1120px; margin:42px auto 0; display:flex; justify-content:space-between; align-items:center; gap:24px; padding:18px 22px; border:1px solid rgba(169,79,110,.22); border-radius:14px; background:#fff6f8; }
+.leaderboard-status>div { display:grid; grid-template-columns:auto 1fr; align-items:center; gap:2px 10px; }
+.leaderboard-status strong { color:#6e1737; font-size:11px; letter-spacing:.12em; }
+.leaderboard-status small { grid-column:2; color:var(--muted); }
+.leaderboard-status button { padding:10px 14px; border:1px solid rgba(24,20,22,.15); border-radius:999px; background:white; font-size:10px; font-weight:800; cursor:pointer; }
+.leaderboard-status button:disabled { opacity:.55; cursor:wait; }
+.live-dot { grid-row:1/3; width:10px; height:10px; border-radius:50%; background:#c79b34; box-shadow:0 0 0 6px rgba(199,155,52,.12); }
+.leaderboard-status--live .live-dot { background:#2e9b5f; box-shadow:0 0 0 6px rgba(46,155,95,.12); animation:leaderboard-pulse 1.8s ease infinite; }
+.leaderboard-tools { max-width:1120px; margin:48px auto 22px; display:flex; justify-content:space-between; align-items:end; gap:32px; }
+.leaderboard-tools h2 { margin:0; font-family:var(--display); font-size:clamp(42px,6vw,76px); font-weight:400; line-height:.9; }
+.leaderboard-tools .field { width:min(100%,420px); }
+.leaderboard-list { max-width:1120px; }
+.leader-row--live { grid-template-columns:70px 72px minmax(0,1fr) 150px 160px; overflow:hidden; border-color:rgba(169,79,110,.17); box-shadow:0 12px 35px rgba(74,38,51,.06); transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease; }
+.leader-row--live:hover { transform:translateY(-2px); border-color:var(--pink); box-shadow:0 18px 45px rgba(74,38,51,.11); }
+.leader-photo { width:64px; height:64px; overflow:hidden; display:grid; place-items:center; border:2px solid white; border-radius:50%; background:linear-gradient(145deg,var(--blush),var(--pink)); color:#771d40; font-family:var(--display); text-decoration:none; box-shadow:0 0 0 1px rgba(169,79,110,.22); }
+.leader-photo img { width:100%; height:100%; object-fit:cover; object-position:center top; }
+.leader-name>a { text-decoration:none; }
+.leader-name small { display:block; color:var(--rose); font-size:8px; font-weight:900; letter-spacing:.14em; }
+.leader-audit { display:grid; justify-items:end; text-align:right; }
+.leader-audit span { padding:5px 9px; border-radius:999px; background:var(--paper); color:#6e1737; font-size:8px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
+.leader-audit small { max-width:160px; margin-top:5px; color:var(--muted); font-size:8px; line-height:1.35; }
+.leaderboard-state { max-width:920px; margin:32px auto; display:grid; gap:8px; padding:42px; border:1px dashed rgba(169,79,110,.4); border-radius:16px; background:#fff8fa; color:var(--muted); text-align:center; }
+.leaderboard-state strong { color:var(--ink); font-family:var(--display); font-size:30px; font-weight:400; }
+.leaderboard-refresh-note { max-width:920px; margin:20px auto 0; color:var(--muted); font-size:9px; text-align:center; }
+@keyframes leaderboard-pulse { 50% { transform:scale(.85); opacity:.65; } }
+
+.vote-hero { position:relative; overflow:hidden; background:radial-gradient(circle at 50% 35%,rgba(233,165,190,.55),transparent 31%),linear-gradient(rgba(246,238,229,.92),rgba(246,238,229,.94)),url('/brand/new-beauty-issue-cover.png') center/cover; }
+.vote-hero__logo { width:120px; height:120px; display:grid; place-items:center; margin:0 auto 28px; padding:12px; border-radius:50%; background:rgba(255,255,255,.94); box-shadow:0 14px 45px rgba(85,26,49,.16); }
+.vote-hero__logo img { width:100%; height:100%; object-fit:contain; }
+.vote-hero .hero-actions { justify-content:center; }
+
 .legal-layout { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 34px; align-items: start; }
 .legal-rail { position: sticky; top: 108px; max-height: calc(100vh - 130px); overflow: auto; padding: 22px; border: 1px solid rgba(24,20,22,.13); border-radius: 14px; background: white; }
 .legal-rail nav { display: grid; gap: 2px; margin: 18px 0; }
@@ -329,6 +368,17 @@ img { display: block; max-width: 100%; }
   .timeline-date { grid-column: 2; text-align: left; }
   .leader-row { grid-template-columns: 44px 1fr; padding: 18px; }
   .leader-votes { grid-column: 2; text-align: left; }
+  .leaderboard-hero { grid-template-columns:1fr; min-height:720px; padding-bottom:60px; }
+  .leaderboard-hero__brand { grid-row:1; justify-self:start; width:150px; margin-bottom:30px; padding:12px; }
+  .leaderboard-hero h1 em { margin-left:0; }
+  .leaderboard-tools { align-items:stretch; flex-direction:column; }
+  .leaderboard-tools .field { width:100%; }
+  .leader-row--live { grid-template-columns:48px 58px minmax(0,1fr); gap:12px; }
+  .leader-photo { width:54px; height:54px; }
+  .leader-row--live .leader-votes { grid-column:2/4; padding-top:12px; border-top:1px solid var(--silver); }
+  .leader-row--live .leader-audit { grid-column:2/4; justify-items:start; text-align:left; }
+  .leaderboard-status { align-items:stretch; flex-direction:column; }
+  .leaderboard-status button { width:100%; }
   .legal-layout { grid-template-columns: 1fr; }
   .legal-rail { position: static; max-height: none; }
   .legal-rail nav { grid-template-columns: repeat(3,1fr); }

@@ -7,6 +7,7 @@ import { getStoredSession, publicFileUrl, rest, uploadPublicFile } from "@/lib/s
 
 type Contestant = {
   id: string;
+  contestant_number: number | null;
   public_slug: string | null;
   public_name: string | null;
   college: string | null;
@@ -77,6 +78,13 @@ export function CampaignProfileEditor() {
   const completion = Math.round((checks.filter((item) => item.ready).length / checks.length) * 100);
   const studioFinished = completion === 100 && profile?.public_profile_status === "published";
   const scoreByCategory = new Map(scores.map((score) => [score.category, score]));
+  // The live Queen Training check-in function records the original database
+  // category name. Surface that award under the current contestant-facing
+  // rubric key so verified attendees immediately see their +10 points.
+  const queenTrainingScore = scoreByCategory.get("queen_training_attendance_and_punctuality");
+  if (queenTrainingScore && !scoreByCategory.has("training_attendance")) {
+    scoreByCategory.set("training_attendance", queenTrainingScore);
+  }
   const awarded = rubric.reduce((sum, item) => sum + Number(scoreByCategory.get(item.key)?.points || 0), 0);
 
   async function uploadSelectedFiles(sessionUserId: string) {
@@ -144,7 +152,7 @@ export function CampaignProfileEditor() {
   return <div className="campaign-studio">
     <section className="campaign-cover-card">
       <img src="/new-beauty-issue-hero.png" alt="The World Has a Beauty Issue — Find Your Pretty in Christ" />
-      <div><p className="eyebrow">YOUR OFFICIAL CAMPAIGN PROMPT</p><h2>Make this unmistakably you.</h2><blockquote>{campaignQuestion}</blockquote><p>There is no required minimum or maximum length. Be creative. A focused 90-second to 3-minute story is only a helpful recommendation—not a rule.</p><a className="button button--paper button--small" href={campaignGuideDownload} target="_blank">Open campaign guide ↗</a></div>
+      <div><p className="eyebrow">{profile.contestant_number ? `CONTESTANT #${String(profile.contestant_number).padStart(3, "0")} · ` : ""}YOUR OFFICIAL CAMPAIGN PROMPT</p><h2>Make this unmistakably you.</h2><blockquote>{campaignQuestion}</blockquote><p>There is no required minimum or maximum length. Be creative. A focused 90-second to 3-minute story is only a helpful recommendation—not a rule.</p><a className="button button--paper button--small" href={campaignGuideDownload} target="_blank">Open campaign guide ↗</a></div>
     </section>
 
     {studioFinished ? <section className="campaign-finished-card" aria-live="polite">

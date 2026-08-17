@@ -15,10 +15,16 @@ type Contestant = {
   headshot_public_path: string | null;
   campaign_video_url: string | null;
   instagram_url?: string | null;
+  contestant_number: number | null;
 };
 
 function voteUrl(row: Contestant) {
-  const query = new URLSearchParams({ contestant_id: row.id, contestant_name: row.public_name || "", school: row.college || "" });
+  const query = new URLSearchParams({
+    contestant_id: row.id,
+    contestant_number: row.contestant_number ? String(row.contestant_number) : "",
+    contestant_name: row.public_name || "",
+    school: row.college || "",
+  });
   return `${content.voting.jotformUrl}?${query.toString()}`;
 }
 
@@ -32,7 +38,7 @@ export function ContestantGallery() {
 
   useEffect(() => {
     void (async () => {
-      const result = await publicRest<Contestant[]>("pgws_contestants?public_profile_status=eq.published&select=id,public_slug,public_name,college,biography,scripture,platform,headshot_public_path,campaign_video_url,instagram_url&order=public_name.asc");
+      const result = await publicRest<Contestant[]>("pgws_contestants?public_profile_status=eq.published&select=id,public_slug,public_name,college,biography,scripture,platform,headshot_public_path,campaign_video_url,instagram_url,contestant_number&order=contestant_number.asc");
       setRows(result.data || []);
       setError(result.error || "");
       setLoading(false);
@@ -50,7 +56,7 @@ export function ContestantGallery() {
     <div className="contestant-profile-grid">{filtered.map((row) => <article className="contestant-profile-card" id={row.public_slug || row.id} key={row.id}>
       <div className="contestant-profile-photo">{row.headshot_public_path ? <img src={publicFileUrl(row.headshot_public_path)} alt={`${row.public_name || "Contestant"} official headshot`} /> : <div>OFFICIAL PROFILE</div>}</div>
       <div className="contestant-profile-copy">
-        <p className="eyebrow">MISS PGWS 2027 CONTESTANT</p><h2>{row.public_name}</h2>{row.college && <p className="contestant-college">{row.college}</p>}
+        <p className="eyebrow">{row.contestant_number ? `CONTESTANT #${String(row.contestant_number).padStart(3, "0")}` : "MISS PGWS 2027 CONTESTANT"}</p><h2>{row.public_name}</h2>{row.college && <p className="contestant-college">{row.college}</p>}
         {row.platform && <><h3>Her platform</h3><p>{row.platform}</p></>}{row.biography && <><h3>Meet her</h3><p>{row.biography}</p></>}{row.scripture && <blockquote>{row.scripture}</blockquote>}
         {row.campaign_video_url && <div className="campaign-video"><p className="eyebrow">WATCH HER CAMPAIGN</p>{isDirectVideo(row.campaign_video_url) ? <video controls preload="metadata" src={row.campaign_video_url}>Your browser cannot play this campaign video.</video> : <a className="button button--paper button--wide" href={row.campaign_video_url} target="_blank" rel="noreferrer">Watch her campaign video ↗</a>}</div>}
         <div className="contestant-card-actions">{row.instagram_url && <a className="button button--paper" href={row.instagram_url} target="_blank" rel="noreferrer">Instagram ↗</a>}<a className="button button--lipstick" href={voteUrl(row)} target="_blank" rel="noreferrer">Vote with purpose ↗</a></div>
