@@ -9,7 +9,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "npm run doctor && npm run build && node --test tests/rendered-html.test.mjs",
+    "test": "npm run doctor && npm run build && node --test tests/rendered-html.test.mjs tests/voting-sync.test.mjs",
     "doctor": "node scripts/foundation-check.mjs",
     "db:generate": "drizzle-kit generate"
   },

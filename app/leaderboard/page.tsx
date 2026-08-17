@@ -1,25 +1,22 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
 import content from "../../content/application-content.json";
 import { SiteFooter } from "../components/SiteFooter";
 import { SiteHeader } from "../components/SiteHeader";
+import { LaunchAction } from "../components/LaunchAction";
+import { LeaderboardClient } from "./LeaderboardClient";
 
 export const metadata: Metadata = { title: "Live Leaderboard" };
-const demo = [
-  { name: "Contestant profiles publish August 22", school: "Official entries will appear here", votes: "—" },
-  { name: "Voting opens August 27", school: "Verified donations only", votes: "—" },
-  { name: "Final audit September 4", school: "Crowning follows September 5", votes: "—" },
-];
 
 export default function LeaderboardPage() {
   return <main>
     <SiteHeader compact />
-    <section className="page-hero"><div className="page-hero-inner"><p className="eyebrow">LIVE · VERIFIED · PROVISIONAL</p><h1>The leaderboard.</h1><p className="lede">Rankings will update from verified voting records during the official voting window. Displayed totals remain provisional until the final audit.</p></div></section>
+    <section className="leaderboard-hero"><div className="leaderboard-hero__copy"><p className="eyebrow eyebrow--light">LIVE · VERIFIED · PROVISIONAL</p><h1>The road to <em>the crown.</em></h1><p>Follow the official Miss PGWS 2027 rankings as completed, eligible payments are verified. Every profile, vote, and rank remains connected to the official competition record.</p><div className="hero-actions"><LaunchAction kind="voting"/><Link className="button button--paper" href="/contestants">Meet all contestants</Link></div></div><div className="leaderboard-hero__brand"><Image src="/brand/miss-pgws-2027-logo.png" alt="Miss Pretty Girls Who Serve 2027" width={520} height={520} priority /></div></section>
     <section className="page-shell">
-      <div className="notice"><span>◆</span><div><strong>Voting is not open yet.</strong><br />{content.calendar.dates.find(d=>d.id==='voting-opens')?.display} through {content.calendar.dates.find(d=>d.id==='voting-closes')?.display}.</div></div>
-      <div className="leaderboard-list">
-        {demo.map((item,index)=><article className="leader-row" key={item.name}><div className="leader-rank">{index+1}</div><div className="leader-name"><strong>{item.name}</strong><span>{item.school}</span></div><div className="leader-votes"><strong>{item.votes}</strong><span>verified votes</span></div></article>)}
-      </div>
-      <div style={{textAlign:'center',marginTop:36}}><a className="button button--lipstick" href={content.voting.jotformUrl} target="_blank" rel="noreferrer">Official vote form ↗</a></div>
+      <div className="notice"><span>◆</span><div><strong>Official voting window</strong><br />{content.calendar.dates.find(d=>d.id==='voting-opens')?.display} through {content.calendar.dates.find(d=>d.id==='voting-closes')?.display}. Only successfully paid and verified votes appear in the live totals.</div></div>
+      <LeaderboardClient />
+      <div className="center-actions"><LaunchAction kind="voting"/><Link className="button button--paper" href="/contestants">Open contestant profiles</Link><Link className="button button--ink" href="/donor-center">Voting and donor terms</Link></div>
     </section>
     <SiteFooter />
   </main>;

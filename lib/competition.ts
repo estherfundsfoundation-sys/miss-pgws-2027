@@ -12,15 +12,15 @@ export const rubric = [
 ] as const;
 
 export const campaignDates = [
-  ["Queen Training & Official Onboarding", "August 15, 2026 · 10:00 AM ET"],
-  ["Campaign video and profile due", "August 19, 2026 · 11:59 PM ET"],
-  ["Video review and corrections", "August 20–21, 2026"],
-  ["Contestant profiles publish", "August 22, 2026"],
-  ["Campaign preparation", "August 22–26, 2026"],
+  ["Queen Training & Official Onboarding", "August 15, 2026"],
+  ["Campaign creation and Contestant Studio build", "August 15–26, 2026"],
+  ["Foundation contestant reveals", "August 25–26, 2026"],
+  ["Contestant announcement graphic", "August 26, 2026 · 10:00 AM ET"],
+  ["Official campaign video post", "August 27, 2026 · 10:00 AM ET"],
   ["Voting opens", "August 27, 2026 · 12:00 PM ET"],
+  ["Campaign week", "August 27–September 3, 2026"],
   ["Voting closes", "September 3, 2026 · 11:59 PM ET"],
-  ["Final audit", "September 4, 2026"],
-  ["Virtual crowning", "September 5, 2026"],
+  ["Final verification and winners announced", "September 4, 2026"],
 ] as const;
 
 export const campaignGuideDownload = "/downloads/PGWS_New_Beauty_Issue_Contestant_Campaign_Guide.pdf";

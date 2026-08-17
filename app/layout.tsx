@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://miss-pgws-2027.vercel.app"),
+  metadataBase: new URL("https://misspgws.estherfundsfoundation.org"),
   title: { default: "Miss Pretty Girls Who Serve 2027 | The New Beauty Issue", template: "%s | Miss PGWS 2027" },
   description: "A national, faith-centered scholarship, leadership, service, advocacy, and personal-development competition for Christian college women.",
   openGraph: { title: "Miss Pretty Girls Who Serve 2027 — The New Beauty Issue", description: "This Isn’t About Makeup. This Is About You.", images: ["/brand/new-beauty-issue-cover.png"] },
