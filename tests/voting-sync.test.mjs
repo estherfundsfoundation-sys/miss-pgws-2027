@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { aggregateVerifiedVotes, parseVoteSubmission } from "../lib/voting-sync-core.ts";
+import { desiredJotformVotingStatus } from "../lib/voting-window.ts";
 
 function paidSubmission(id, paymentStatus, products, total, transactionId = `pi_${id}_verified`) {
   return {
@@ -63,4 +64,11 @@ test("counts a Stripe transaction only once", () => {
   assert.equal(result.verifiedSubmissions, 1);
   assert.equal(result.duplicateTransactions, 1);
   assert.equal(result.votesByContestantNumber.get(10), 3);
+});
+
+test("keeps the ballot closed outside the official voting window", () => {
+  assert.equal(desiredJotformVotingStatus(new Date("2026-08-27T15:59:59.999Z")), "Disabled");
+  assert.equal(desiredJotformVotingStatus(new Date("2026-08-27T16:00:00.000Z")), "Enabled");
+  assert.equal(desiredJotformVotingStatus(new Date("2026-09-04T03:59:59.999Z")), "Enabled");
+  assert.equal(desiredJotformVotingStatus(new Date("2026-09-04T04:00:00.000Z")), "Disabled");
 });

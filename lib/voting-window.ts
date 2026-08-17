@@ -5,3 +5,7 @@ export function isVotingWindowOpen(now = new Date()) {
   const timestamp = now.getTime();
   return timestamp >= Date.parse(VOTING_OPENS_AT) && timestamp <= Date.parse(VOTING_CLOSES_AT);
 }
+
+export function desiredJotformVotingStatus(now = new Date()) {
+  return isVotingWindowOpen(now) ? "Enabled" : "Disabled";
+}
