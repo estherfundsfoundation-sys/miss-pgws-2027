@@ -56,7 +56,10 @@ export function ContestantOperations() {
   const operationByContestant = useMemo(() => new Map(operations.map((item) => [item.contestant_id, item])), [operations]);
   const scoreByContestant = useMemo(() => {
     const result = new Map<string, number>();
-    for (const score of scores) result.set(score.contestant_id, (result.get(score.contestant_id) || 0) + Number(score.points));
+    for (const score of scores) {
+      if (score.category === "queen_training_attendance_and_punctuality") continue;
+      result.set(score.contestant_id, (result.get(score.contestant_id) || 0) + Number(score.points));
+    }
     return result;
   }, [scores]);
   const voteByContestant = useMemo(() => new Map(votes.map((item) => [item.contestant_id, item])), [votes]);
