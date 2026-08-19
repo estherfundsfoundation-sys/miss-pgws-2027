@@ -1,0 +1,7 @@
+project_id = "miss-pgws-2027"
+
+[api]
+enabled = true
+
+[db]
+major_version = 17
