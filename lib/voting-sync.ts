@@ -160,7 +160,7 @@ export async function syncVerifiedVotes({ dryRun = false }: { dryRun?: boolean }
 
 export async function getVotingLeaderboard() {
   const [contestants, totals, settings] = await Promise.all([
-    databaseFetch("pgws_contestants?contestant_number=not.is.null&select=id,public_slug,public_name,college,contestant_number,headshot_public_path,public_profile_status&order=contestant_number.asc"),
+    databaseFetch("pgws_contestants?contestant_number=not.is.null&public_profile_status=eq.published&select=id,public_slug,public_name,college,contestant_number,headshot_public_path,public_profile_status&order=contestant_number.asc"),
     databaseFetch("pgws_vote_totals?select=contestant_id,verified_votes,verified_amount_cents,provisional_rank,last_synced_at,audit_status&order=verified_votes.desc"),
     databaseFetch("pgws_platform_settings?singleton=eq.true&select=voting_open&limit=1"),
   ]) as [Row[], Row[], Row[]];
