@@ -43,8 +43,16 @@ export async function POST(request: NextRequest) {
       });
       const body = await response.json().catch(() => ({}));
       if (response.ok) return NextResponse.json({ id: body.id, status: "sent" });
-      if (response.status !== 429 || attempt === 3)
-        throw new Error(body?.message ?? "The email provider rejected the message.");
+      if (response.status !== 429 || attempt === 3) {
+        console.error("PGWS mail bridge provider rejection", response.status, JSON.stringify(body));
+        throw new Error(
+          typeof body?.message === "string"
+            ? body.message
+            : typeof body?.error === "string"
+              ? body.error
+              : JSON.stringify(body) || "The email provider rejected the message.",
+        );
+      }
       await new Promise((resolve) => setTimeout(resolve, 700 * (attempt + 1)));
     }
     throw new Error("The email provider did not accept the message.");
