@@ -47,8 +47,13 @@ export function CampaignProfileEditor() {
       const session = getStoredSession();
       if (!session) { setMessage("Please sign in to open your contestant workspace."); return; }
       const result = await rest<Contestant[]>(`pgws_contestants?user_id=eq.${session.user.id}&select=*&limit=1`);
-      const row = result.data?.[0] ?? null;
-      if (!row) { setMessage("This workspace opens after competition staff accepts your application."); return; }
+      let row = result.data?.[0] ?? null;
+      if (!row) {
+        const response = await fetch("/api/contestant/claim", { method: "POST", headers: { Authorization: `Bearer ${session.access_token}` } });
+        const repaired = await response.json().catch(() => ({}));
+        row = repaired.contestant ?? null;
+        if (!row) { setMessage(repaired.error || "We could not link your accepted contestant record. Please contact PGWS support."); return; }
+      }
       setProfile(row);
       setName(row.public_name || "");
       setBio(row.biography || "");
@@ -93,7 +98,7 @@ export function CampaignProfileEditor() {
     if (headshot) {
       headshotPath = `${sessionUserId}/profile/${Date.now()}-${clean(headshot.name)}`;
       const uploaded = await uploadPublicFile(headshotPath, headshot);
-      if (uploaded.error) throw new Error(uploaded.error);
+      if (uploaded.error) throw new Error(`${uploaded.error} Paste a public YouTube, Vimeo, Google Drive, Canva, or Dropbox link below instead.`);
     }
     if (video) {
       const videoPath = `${sessionUserId}/campaign/${Date.now()}-${clean(video.name)}`;
@@ -189,7 +194,7 @@ export function CampaignProfileEditor() {
         <label className="field field--wide"><span>Signature scripture</span><input value={scripture} onChange={(event) => setScripture(event.target.value)} placeholder="Example: Psalm 139:14 — I am fearfully and wonderfully made." required /></label>
         <label className="field"><span>Official headshot</span><input type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => setHeadshot(event.target.files?.[0] || null)} /><small>JPG, PNG, or WebP. Portrait orientation; no private information.</small></label>
         <label className="field"><span>Optional direct video upload</span><input type="file" accept="video/mp4,video/quicktime" onChange={(event) => setVideo(event.target.files?.[0] || null)} /><small>MP4 or MOV, up to 250 MB. A pasted link also works.</small></label>
-        <label className="field field--wide"><span>Campaign video link</span><input type="url" value={videoUrl} onChange={(event) => setVideoUrl(event.target.value)} placeholder="https://…" /><small>Paste your YouTube, Vimeo, or direct video link. Confirm viewers do not need permission.</small></label>
+        <label className="field field--wide"><span>Campaign video link</span><input type="url" value={videoUrl} onChange={(event) => setVideoUrl(event.target.value)} placeholder="https://…" /><small>Paste a public YouTube, Vimeo, Google Drive, Canva, Dropbox, or direct video link. Confirm viewers do not need permission.</small></label>
         <label className="field field--wide"><span>Instagram campaign post link</span><input type="url" value={instagramUrl} onChange={(event) => setInstagramUrl(event.target.value)} placeholder="https://www.instagram.com/…" /><small>Post your campaign video on Instagram, then paste the public post or Reel link here.</small></label>
       </div>
       <div className="campaign-publish-actions">
