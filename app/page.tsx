@@ -4,21 +4,17 @@ import content from "../content/application-content.json";
 import org from "../content/organization-content.json";
 import { SiteFooter } from "./components/SiteFooter";
 import { SiteHeader } from "./components/SiteHeader";
-import { LaunchAction } from "./components/LaunchAction";
-
-const featuredDates = ["applications-open", "priority-deadline", "final-application-deadline", "queen-training-and-official-onboarding"];
 
 export default function Home() {
-  const dates = content.calendar.dates.filter((item) => featuredDates.includes(item.id));
   return <main>
     <SiteHeader />
     <section className="hero">
       <div className="hero-copy">
-        <p className="eyebrow">APPLICATIONS OPEN · MISS PRETTY GIRLS WHO SERVE 2027</p>
+        <p className="eyebrow">VOTING OPENS AUGUST 27 AT 12 PM ET · MISS PGWS 2027</p>
         <h1>The New <span>Beauty Issue</span></h1>
         <p className="hero-tagline">This Isn’t About Makeup. This Is About You.</p>
         <p className="hero-description">{content.publicCopy.coreMessage}</p>
-        <div className="hero-actions"><Link className="button button--lipstick" href="/create-account">Apply Now — Become the Next PGWS</Link><Link className="button button--paper" href="/timeline">Review competition dates</Link></div>
+        <div className="hero-actions"><Link className="button button--lipstick" href="/vote">Vote Now</Link><Link className="button button--paper" href="/contestants">Meet the Contestants</Link></div>
       </div>
       <div className="hero-art"><Image src="/brand/new-beauty-issue-cover.png" alt="Miss Pretty Girls Who Serve 2027 — The New Beauty Issue" fill priority sizes="(max-width: 1040px) 100vw, 45vw" /></div>
       <span className="hero-ruby" aria-hidden="true" />
@@ -46,7 +42,7 @@ export default function Home() {
 
     <section className="scripture-strip"><blockquote>“{content.signatureScripture.text}”</blockquote><cite>{content.signatureScripture.reference} · {content.signatureScripture.translation}</cite></section>
 
-    <section className="section section--blush"><div className="deadline-panel"><div className="deadline-copy"><p className="eyebrow">THE 2027 ISSUE · OPERATING IN 2026</p><h2>Your moment starts now.</h2><p className="lede">Applications are open to eligible Christian college women. Create your account, complete the official application, upload your materials, and sign the Contestant Agreement.</p><div className="deadline-list">{dates.map((item) => <div className="deadline-item" key={item.id}><b>{item.label}</b><span>{item.display}</span></div>)}</div><div className="hero-actions" style={{ marginTop: 28 }}><LaunchAction kind="applications"/><Link className="button button--paper" href="/timeline">Full timeline</Link></div></div><div className="deadline-art"><Image src="/brand/miss-pgws-2027-logo.png" alt="Official Miss Pretty Girls Who Serve 2027 logo" width={1536} height={1536} sizes="(max-width: 1040px) 100vw, 45vw" /></div></div></section>
+    <section className="section section--blush"><div className="deadline-panel"><div className="deadline-copy"><p className="eyebrow">THE ROAD TO THE CROWN</p><h2>Meet them. Support them. Vote with purpose.</h2><p className="lede">The contestants are sharing their faith, stories, service platforms, and purpose. Explore their published profiles before voting opens Thursday, August 27, 2026, at 12:00 PM ET.</p><div className="hero-actions" style={{ marginTop: 28 }}><Link className="button button--lipstick" href="/contestants">Meet the Contestants</Link><Link className="button button--paper" href="/donor-center">Open Donor Center</Link></div></div><div className="deadline-art"><Image src="/brand/miss-pgws-2027-logo.png" alt="Official Miss Pretty Girls Who Serve 2027 logo" width={1536} height={1536} sizes="(max-width: 1040px) 100vw, 45vw" /></div></div></section>
 
     <section className="section section--ink">
       <div className="section-heading"><div><p className="eyebrow eyebrow--light">SCHOLARSHIP & FUNDRAISING</p><h2>Votes create impact.</h2></div><p>{content.publicCopy.scholarshipAndFundraisingMessage}</p></div>
