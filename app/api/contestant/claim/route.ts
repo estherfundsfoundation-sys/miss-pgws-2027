@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 const base = () => process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
-const serviceKey = () => process.env.SUPABASE_SERVICE_ROLE_KEY;
+const serviceKey = () => process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 const serviceHeaders = () => ({ apikey: serviceKey() || "", Authorization: `Bearer ${serviceKey() || ""}`, "Content-Type": "application/json" });
 
 export async function POST(request: Request) {
