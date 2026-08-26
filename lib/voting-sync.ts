@@ -154,6 +154,10 @@ export async function syncVerifiedVotes({ dryRun = false }: { dryRun?: boolean }
   const ballotRosterInspectable = ballotNumbers.size > 0;
   const missingBallotContestantNumbers = ballotRosterInspectable ? [...knownNumbers].filter((number) => !ballotNumbers.has(number)).sort((a, b) => a - b) : [];
   const unexpectedBallotContestantNumbers = ballotRosterInspectable ? [...ballotNumbers].filter((number) => !knownNumbers.has(number)).sort((a, b) => a - b) : [];
+  const ballotConfigurationSamples = ["control_stripe", ...missingBallotContestantNumbers.map(String), ...unexpectedBallotContestantNumbers.map(String)].map((needle) => {
+    const index = ballotConfiguration.toLocaleLowerCase().indexOf(needle.toLocaleLowerCase());
+    return index < 0 ? null : ballotConfiguration.slice(Math.max(0, index - 240), Math.min(ballotConfiguration.length, index + 420));
+  }).filter((sample): sample is string => Boolean(sample));
   const unmatchedContestantNumbers = [...aggregation.votesByContestantNumber.keys()].filter((number) => !knownNumbers.has(number)).sort((a, b) => a - b);
   for (const number of unmatchedContestantNumbers) aggregation.votesByContestantNumber.delete(number);
 
@@ -176,6 +180,7 @@ export async function syncVerifiedVotes({ dryRun = false }: { dryRun?: boolean }
     ballotRosterInspectable,
     missingBallotContestantNumbers,
     unexpectedBallotContestantNumbers,
+    ballotConfigurationSamples,
     submissionCount: submissions.length,
     verifiedSubmissions: aggregation.verifiedSubmissions,
     ignoredSubmissions: aggregation.ignoredSubmissions,
