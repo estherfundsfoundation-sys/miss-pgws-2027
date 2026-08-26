@@ -154,7 +154,7 @@ export async function syncVerifiedVotes({ dryRun = false }: { dryRun?: boolean }
   const ballotRosterInspectable = ballotNumbers.size > 0;
   const missingBallotContestantNumbers = ballotRosterInspectable ? [...knownNumbers].filter((number) => !ballotNumbers.has(number)).sort((a, b) => a - b) : [];
   const unexpectedBallotContestantNumbers = ballotRosterInspectable ? [...ballotNumbers].filter((number) => !knownNumbers.has(number)).sort((a, b) => a - b) : [];
-  const ballotConfigurationSamples = ["control_stripe", ...missingBallotContestantNumbers.map(String), ...unexpectedBallotContestantNumbers.map(String)].map((needle) => {
+  const ballotConfigurationSamples = ["control_stripe", '"products"', ...missingBallotContestantNumbers.map((number) => `Contestant ${String(number).padStart(3, "0")}`), ...unexpectedBallotContestantNumbers.map((number) => `Contestant ${String(number).padStart(3, "0")}`)].map((needle) => {
     const index = ballotConfiguration.toLocaleLowerCase().indexOf(needle.toLocaleLowerCase());
     return index < 0 ? null : ballotConfiguration.slice(Math.max(0, index - 240), Math.min(ballotConfiguration.length, index + 420));
   }).filter((sample): sample is string => Boolean(sample));
