@@ -94,7 +94,15 @@ export async function fetchVotingSubmissions() {
 }
 
 async function contestantRows() {
-  return await databaseFetch("pgws_contestants?contestant_number=not.is.null&select=id,contestant_number,public_name&order=contestant_number.asc") as ContestantRow[];
+  return await databaseFetch("pgws_contestants?contestant_number=not.is.null&select=id,contestant_number,public_name,pgws_applications!inner(status)&pgws_applications.status=eq.accepted&order=contestant_number.asc") as ContestantRow[];
+}
+
+export async function setPlatformVotingOpen(votingOpen: boolean) {
+  await databaseFetch("pgws_platform_settings?singleton=eq.true", {
+    method: "PATCH",
+    headers: { Prefer: "return=minimal" },
+    body: JSON.stringify({ voting_open: votingOpen }),
+  });
 }
 
 function rankedRows(contestants: ContestantRow[], votes: Map<number, number>, syncedAt: string) {
@@ -128,7 +136,7 @@ export async function syncVerifiedVotes({ dryRun = false }: { dryRun?: boolean }
   const aggregation = aggregateVerifiedVotes(submissions, PRICE_PER_VOTE_CENTS);
   const knownNumbers = new Set(contestants.map((row) => Number(row.contestant_number)));
   const unmatchedContestantNumbers = [...aggregation.votesByContestantNumber.keys()].filter((number) => !knownNumbers.has(number)).sort((a, b) => a - b);
-  if (unmatchedContestantNumbers.length) throw new Error(`Paid votes reference unknown contestant numbers: ${unmatchedContestantNumbers.map((number) => String(number).padStart(3, "0")).join(", ")}.`);
+  for (const number of unmatchedContestantNumbers) aggregation.votesByContestantNumber.delete(number);
 
   const syncedAt = new Date().toISOString();
   const rows = rankedRows(contestants, aggregation.votesByContestantNumber, syncedAt);
@@ -160,7 +168,7 @@ export async function syncVerifiedVotes({ dryRun = false }: { dryRun?: boolean }
 
 export async function getVotingLeaderboard() {
   const [contestants, totals, settings] = await Promise.all([
-    databaseFetch("pgws_contestants?contestant_number=not.is.null&public_profile_status=eq.published&select=id,public_slug,public_name,college,contestant_number,headshot_public_path,public_profile_status&order=contestant_number.asc"),
+    databaseFetch("pgws_contestants?contestant_number=not.is.null&public_profile_status=eq.published&select=id,public_slug,public_name,college,contestant_number,headshot_public_path,public_profile_status,pgws_applications!inner(status)&pgws_applications.status=eq.accepted&order=contestant_number.asc"),
     databaseFetch("pgws_vote_totals?select=contestant_id,verified_votes,verified_amount_cents,provisional_rank,last_synced_at,audit_status&order=verified_votes.desc"),
     databaseFetch("pgws_platform_settings?singleton=eq.true&select=voting_open&limit=1"),
   ]) as [Row[], Row[], Row[]];

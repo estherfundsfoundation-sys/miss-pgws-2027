@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { getStoredSession } from "@/lib/supabase-browser";
+import { getStoredSession, refreshSession } from "@/lib/supabase-browser";
 
 type Result = {
   contestantCount: number;
@@ -16,15 +16,24 @@ export function VotingSyncPanel() {
   const [result, setResult] = useState<Result | null>(null);
 
   async function run(mode: "preview" | "sync") {
-    const session = getStoredSession();
+    let session = getStoredSession();
     if (!session) { setMessage("Sign in with a voting and finance administrator account first."); return; }
     setBusy(true);
     setMessage("");
-    const response = await fetch("/api/admin/voting/sync", {
+    if (!session.expires_at || session.expires_at * 1000 <= Date.now() + 60_000) {
+      session = await refreshSession();
+    }
+    if (!session) { setBusy(false); setMessage("Your staff session expired. Please sign in again."); return; }
+    const request = (accessToken: string) => fetch("/api/admin/voting/sync", {
       method: "POST",
-      headers: { Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json" },
+      headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
       body: JSON.stringify({ mode }),
     });
+    let response = await request(session.access_token);
+    if (response.status === 403) {
+      const renewed = await refreshSession();
+      if (renewed) response = await request(renewed.access_token);
+    }
     const body = await response.json().catch(() => ({}));
     setBusy(false);
     if (!response.ok) { setMessage(body.error || "Vote synchronization failed."); return; }
