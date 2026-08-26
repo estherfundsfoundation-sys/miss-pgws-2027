@@ -97,6 +97,15 @@ async function contestantRows() {
   return await databaseFetch("pgws_contestants?contestant_number=not.is.null&select=id,contestant_number,public_name,pgws_applications!inner(status)&pgws_applications.status=eq.accepted&order=contestant_number.asc") as ContestantRow[];
 }
 
+async function fetchVotingBallotNumbers() {
+  const { apiKey, formId } = jotformConfig();
+  const questions = await jotformRequest(`/form/${formId}/questions`, apiKey);
+  const numbers = new Set<number>();
+  const serialized = JSON.stringify(questions);
+  for (const match of serialized.matchAll(/\bContestant\s*#?\s*(\d{1,3})\b/gi)) numbers.add(Number(match[1]));
+  return numbers;
+}
+
 export async function setPlatformVotingOpen(votingOpen: boolean) {
   await databaseFetch("pgws_platform_settings?singleton=eq.true", {
     method: "PATCH",
@@ -131,10 +140,12 @@ function rankedRows(contestants: ContestantRow[], votes: Map<number, number>, sy
 }
 
 export async function syncVerifiedVotes({ dryRun = false }: { dryRun?: boolean } = {}) {
-  const [submissions, contestants] = await Promise.all([fetchVotingSubmissions(), contestantRows()]);
+  const [submissions, contestants, ballotNumbers] = await Promise.all([fetchVotingSubmissions(), contestantRows(), fetchVotingBallotNumbers()]);
   if (!contestants.length) throw new Error("No numbered contestants are available for voting synchronization.");
   const aggregation = aggregateVerifiedVotes(submissions, PRICE_PER_VOTE_CENTS);
   const knownNumbers = new Set(contestants.map((row) => Number(row.contestant_number)));
+  const missingBallotContestantNumbers = [...knownNumbers].filter((number) => !ballotNumbers.has(number)).sort((a, b) => a - b);
+  const unexpectedBallotContestantNumbers = [...ballotNumbers].filter((number) => !knownNumbers.has(number)).sort((a, b) => a - b);
   const unmatchedContestantNumbers = [...aggregation.votesByContestantNumber.keys()].filter((number) => !knownNumbers.has(number)).sort((a, b) => a - b);
   for (const number of unmatchedContestantNumbers) aggregation.votesByContestantNumber.delete(number);
 
@@ -153,6 +164,9 @@ export async function syncVerifiedVotes({ dryRun = false }: { dryRun?: boolean }
     dryRun,
     formId: process.env.JOTFORM_VOTING_FORM_ID || DEFAULT_FORM_ID,
     contestantCount: contestants.length,
+    ballotContestantCount: ballotNumbers.size,
+    missingBallotContestantNumbers,
+    unexpectedBallotContestantNumbers,
     submissionCount: submissions.length,
     verifiedSubmissions: aggregation.verifiedSubmissions,
     ignoredSubmissions: aggregation.ignoredSubmissions,
