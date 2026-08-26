@@ -99,8 +99,12 @@ async function contestantRows() {
 
 async function fetchVotingBallotConfiguration() {
   const { apiKey, formId } = jotformConfig();
-  const questions = await jotformRequest(`/form/${formId}/questions`, apiKey);
-  return JSON.stringify(questions);
+  const [questions, properties, form] = await Promise.all([
+    jotformRequest(`/form/${formId}/questions`, apiKey),
+    jotformRequest(`/form/${formId}/properties`, apiKey),
+    jotformRequest(`/form/${formId}`, apiKey),
+  ]);
+  return JSON.stringify({ questions, properties, form });
 }
 
 export async function setPlatformVotingOpen(votingOpen: boolean) {
@@ -147,8 +151,9 @@ export async function syncVerifiedVotes({ dryRun = false }: { dryRun?: boolean }
   for (const contestant of contestants) {
     if (contestant.public_name && normalizedBallot.includes(contestant.public_name.toLocaleLowerCase())) ballotNumbers.add(Number(contestant.contestant_number));
   }
-  const missingBallotContestantNumbers = [...knownNumbers].filter((number) => !ballotNumbers.has(number)).sort((a, b) => a - b);
-  const unexpectedBallotContestantNumbers = [...ballotNumbers].filter((number) => !knownNumbers.has(number)).sort((a, b) => a - b);
+  const ballotRosterInspectable = ballotNumbers.size > 0;
+  const missingBallotContestantNumbers = ballotRosterInspectable ? [...knownNumbers].filter((number) => !ballotNumbers.has(number)).sort((a, b) => a - b) : [];
+  const unexpectedBallotContestantNumbers = ballotRosterInspectable ? [...ballotNumbers].filter((number) => !knownNumbers.has(number)).sort((a, b) => a - b) : [];
   const unmatchedContestantNumbers = [...aggregation.votesByContestantNumber.keys()].filter((number) => !knownNumbers.has(number)).sort((a, b) => a - b);
   for (const number of unmatchedContestantNumbers) aggregation.votesByContestantNumber.delete(number);
 
@@ -168,6 +173,7 @@ export async function syncVerifiedVotes({ dryRun = false }: { dryRun?: boolean }
     formId: process.env.JOTFORM_VOTING_FORM_ID || DEFAULT_FORM_ID,
     contestantCount: contestants.length,
     ballotContestantCount: ballotNumbers.size,
+    ballotRosterInspectable,
     missingBallotContestantNumbers,
     unexpectedBallotContestantNumbers,
     submissionCount: submissions.length,
