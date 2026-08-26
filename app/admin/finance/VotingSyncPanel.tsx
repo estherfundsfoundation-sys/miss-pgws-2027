@@ -6,6 +6,7 @@ import { getStoredSession, refreshSession } from "@/lib/supabase-browser";
 type Result = {
   contestantCount: number;
   ballotContestantCount: number;
+  ballotRosterInspectable: boolean;
   missingBallotContestantNumbers: number[];
   unexpectedBallotContestantNumbers: number[];
   verifiedVotes: number;
@@ -42,7 +43,7 @@ export function VotingSyncPanel() {
     if (!response.ok) { setMessage(body.error || "Vote synchronization failed."); return; }
     setResult(body);
     const mismatch = body.missingBallotContestantNumbers?.length || body.unexpectedBallotContestantNumbers?.length;
-    setMessage(mismatch ? "Ballot roster mismatch found. Review the missing or unexpected contestant numbers before voting opens." : mode === "sync" ? "Verified vote totals synchronized." : "Preview complete. The ballot roster matches and no leaderboard totals were changed.");
+    setMessage(mismatch ? "Ballot roster mismatch found. Review the missing or unexpected contestant numbers before voting opens." : !body.ballotRosterInspectable ? "Payment reconciliation passed. Jotform is not exposing its disabled payment choices through the API, so verify the visual roster when the ballot opens." : mode === "sync" ? "Verified vote totals synchronized." : "Preview complete. The ballot roster matches and no leaderboard totals were changed.");
   }
 
   return <div className="panel voting-sync-panel">
@@ -51,6 +52,6 @@ export function VotingSyncPanel() {
     <p>Only successfully paid submissions with a Stripe transaction ID, exact $2.50-per-vote totals, and a recognized contestant number are included. Pending, failed, refunded, disputed, voided, and charged-back payments are excluded.</p>
     <div className="hero-actions"><button className="button button--paper" type="button" disabled={busy} onClick={() => void run("preview")}>Preview reconciliation</button><button className="button button--lipstick" type="button" disabled={busy} onClick={() => void run("sync")}>Synchronize verified votes</button></div>
     {message && <p role="status" className="field-help">{message}</p>}
-    {result && <><div className="stat-grid"><div className="stat-card"><strong>{result.contestantCount}</strong><span>accepted contestants</span></div><div className="stat-card"><strong>{result.ballotContestantCount}</strong><span>Jotform ballot choices</span></div><div className="stat-card"><strong>{result.verifiedVotes}</strong><span>verified votes</span></div><div className="stat-card"><strong>{result.unresolvedSubmissions}</strong><span>requires staff review</span></div></div>{(result.missingBallotContestantNumbers.length > 0 || result.unexpectedBallotContestantNumbers.length > 0) && <div className="notice"><strong>Ballot roster needs correction.</strong>{result.missingBallotContestantNumbers.length > 0 && <p>Missing: {result.missingBallotContestantNumbers.map((number) => String(number).padStart(3, "0")).join(", ")}</p>}{result.unexpectedBallotContestantNumbers.length > 0 && <p>Unexpected or no longer accepted: {result.unexpectedBallotContestantNumbers.map((number) => String(number).padStart(3, "0")).join(", ")}</p>}</div>}</>}
+    {result && <><div className="stat-grid"><div className="stat-card"><strong>{result.contestantCount}</strong><span>accepted contestants</span></div><div className="stat-card"><strong>{result.ballotRosterInspectable ? result.ballotContestantCount : "Closed"}</strong><span>Jotform ballot roster</span></div><div className="stat-card"><strong>{result.verifiedVotes}</strong><span>verified votes</span></div><div className="stat-card"><strong>{result.unresolvedSubmissions}</strong><span>requires staff review</span></div></div>{(result.missingBallotContestantNumbers.length > 0 || result.unexpectedBallotContestantNumbers.length > 0) && <div className="notice"><strong>Ballot roster needs correction.</strong>{result.missingBallotContestantNumbers.length > 0 && <p>Missing: {result.missingBallotContestantNumbers.map((number) => String(number).padStart(3, "0")).join(", ")}</p>}{result.unexpectedBallotContestantNumbers.length > 0 && <p>Unexpected or no longer accepted: {result.unexpectedBallotContestantNumbers.map((number) => String(number).padStart(3, "0")).join(", ")}</p>}</div>}</>}
   </div>;
 }
