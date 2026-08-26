@@ -97,13 +97,10 @@ async function contestantRows() {
   return await databaseFetch("pgws_contestants?contestant_number=not.is.null&select=id,contestant_number,public_name,pgws_applications!inner(status)&pgws_applications.status=eq.accepted&order=contestant_number.asc") as ContestantRow[];
 }
 
-async function fetchVotingBallotNumbers() {
+async function fetchVotingBallotConfiguration() {
   const { apiKey, formId } = jotformConfig();
   const questions = await jotformRequest(`/form/${formId}/questions`, apiKey);
-  const numbers = new Set<number>();
-  const serialized = JSON.stringify(questions);
-  for (const match of serialized.matchAll(/\bContestant\s*#?\s*(\d{1,3})\b/gi)) numbers.add(Number(match[1]));
-  return numbers;
+  return JSON.stringify(questions);
 }
 
 export async function setPlatformVotingOpen(votingOpen: boolean) {
@@ -140,10 +137,16 @@ function rankedRows(contestants: ContestantRow[], votes: Map<number, number>, sy
 }
 
 export async function syncVerifiedVotes({ dryRun = false }: { dryRun?: boolean } = {}) {
-  const [submissions, contestants, ballotNumbers] = await Promise.all([fetchVotingSubmissions(), contestantRows(), fetchVotingBallotNumbers()]);
+  const [submissions, contestants, ballotConfiguration] = await Promise.all([fetchVotingSubmissions(), contestantRows(), fetchVotingBallotConfiguration()]);
   if (!contestants.length) throw new Error("No numbered contestants are available for voting synchronization.");
   const aggregation = aggregateVerifiedVotes(submissions, PRICE_PER_VOTE_CENTS);
   const knownNumbers = new Set(contestants.map((row) => Number(row.contestant_number)));
+  const ballotNumbers = new Set<number>();
+  for (const match of ballotConfiguration.matchAll(/\bContestant\s*#?\s*(\d{1,3})\b/gi)) ballotNumbers.add(Number(match[1]));
+  const normalizedBallot = ballotConfiguration.toLocaleLowerCase();
+  for (const contestant of contestants) {
+    if (contestant.public_name && normalizedBallot.includes(contestant.public_name.toLocaleLowerCase())) ballotNumbers.add(Number(contestant.contestant_number));
+  }
   const missingBallotContestantNumbers = [...knownNumbers].filter((number) => !ballotNumbers.has(number)).sort((a, b) => a - b);
   const unexpectedBallotContestantNumbers = [...ballotNumbers].filter((number) => !knownNumbers.has(number)).sort((a, b) => a - b);
   const unmatchedContestantNumbers = [...aggregation.votesByContestantNumber.keys()].filter((number) => !knownNumbers.has(number)).sort((a, b) => a - b);
