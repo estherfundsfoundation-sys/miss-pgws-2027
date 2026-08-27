@@ -16,7 +16,15 @@ function authorized(request: NextRequest) {
 export async function GET(request: NextRequest) {
   if (!authorized(request)) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   try {
-    return NextResponse.json({ success: true, ...(await syncVerifiedVotes()) });
+    const result = await syncVerifiedVotes();
+    console.info("[voting-reconcile]", JSON.stringify({
+      submissionCount: result.submissionCount,
+      verifiedSubmissions: result.verifiedSubmissions,
+      verifiedVotes: result.verifiedVotes,
+      unresolvedSubmissions: result.unresolvedSubmissions,
+      reasonCounts: result.reasonCounts,
+    }));
+    return NextResponse.json({ success: true, ...result });
   } catch (reason) {
     return NextResponse.json({ error: reason instanceof Error ? reason.message : "Vote reconciliation failed." }, { status: 500 });
   }

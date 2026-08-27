@@ -260,6 +260,7 @@ export async function syncVerifiedVotes({ dryRun = false }: { dryRun?: boolean }
     duplicateTransactions: aggregation.duplicateTransactions,
     unresolvedSubmissions: aggregation.unresolvedSubmissions,
     unresolvedSubmissionIds: aggregation.unresolvedSubmissionIds.slice(0, 25),
+    reasonCounts: aggregation.reasonCounts,
     verifiedVotes,
     verifiedAmountCents: verifiedVotes * PRICE_PER_VOTE_CENTS,
     unmatchedContestantNumbers,

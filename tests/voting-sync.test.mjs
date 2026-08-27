@@ -66,6 +66,29 @@ test("counts a Stripe transaction only once", () => {
   assert.equal(result.votesByContestantNumber.get(10), 3);
 });
 
+test("accepts Jotform paid submissions whose transaction proves payment when paymentStatus is omitted", () => {
+  const submission = paidSubmission("1010", "", [{ name: "Contestant #021 - Example", quantity: 4 }], "10.00", "pi_statusless_paid");
+  const parsed = parseVoteSubmission(submission);
+  assert.equal(parsed.eligible, true);
+  assert.equal(parsed.votesByContestantNumber.get(21), 4);
+});
+
+test("reads paymentTransactionId and derives a single-contestant quantity from the paid total", () => {
+  const parsed = parseVoteSubmission({
+    id: "1011",
+    status: "ACTIVE",
+    payment_status: "SUCCESSFUL",
+    payment_total: "25.00",
+    answers: {
+      2: { type: "control_dropdown", text: "Select the contestant you are voting for", answer: "Contestant #042 - Example" },
+      3: { type: "control_stripe", text: "Payment", answer: { paymentTransactionId: "pi_quantity_vote" } },
+    },
+  });
+  assert.equal(parsed.eligible, true);
+  assert.equal(parsed.votesByContestantNumber.get(42), 10);
+  assert.equal(parsed.totalCents, 2500);
+});
+
 test("keeps the ballot closed outside the official voting window", () => {
   assert.equal(desiredJotformVotingStatus(new Date("2026-08-27T09:59:59.999Z")), "Disabled");
   assert.equal(desiredJotformVotingStatus(new Date("2026-08-27T10:00:00.000Z")), "Enabled");

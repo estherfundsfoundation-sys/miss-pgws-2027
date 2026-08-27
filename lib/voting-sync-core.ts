@@ -20,6 +20,7 @@ export type VoteAggregation = {
   unresolvedSubmissions: number;
   votesByContestantNumber: Map<number, number>;
   unresolvedSubmissionIds: string[];
+  reasonCounts: Record<string, number>;
 };
 
 const SUCCESS_STATUSES = new Set(["APPROVED", "CAPTURED", "COMPLETED", "PAID", "SUCCESS", "SUCCESSFUL"]);
@@ -61,6 +62,22 @@ function quantityFromRecord(record: Record<string, unknown>) {
 
 function addVote(target: Map<number, number>, number: number, quantity: number) {
   target.set(number, (target.get(number) || 0) + quantity);
+}
+
+function hasExplicitQuantity(value: unknown, visited = new Set<object>()): boolean {
+  if (Array.isArray(value)) {
+    if (visited.has(value)) return false;
+    visited.add(value);
+    return value.some((item) => hasExplicitQuantity(item, visited));
+  }
+  const record = asRecord(value);
+  if (!record || visited.has(record)) return false;
+  visited.add(record);
+  for (const [key, child] of Object.entries(record)) {
+    if (/^(quantity|qty|count|selected_?quantity)$/i.test(key) && integer(child)) return true;
+    if (hasExplicitQuantity(child, visited)) return true;
+  }
+  return false;
 }
 
 function extractProducts(value: unknown, target: Map<number, number>, visited = new Set<object>()) {
@@ -140,12 +157,13 @@ function extractStatuses(submission: JotformSubmission, payments: unknown[]) {
 
 function extractTransactionId(submission: JotformSubmission, payments: unknown[]) {
   const values: string[] = [];
-  collectNamedValues(submission, /^(charge_?id|payment_?id|payment_?intent|stripe_?transaction_?id|transaction_?id|transaction)$/i, values);
-  for (const payment of payments) collectNamedValues(payment, /^(charge_?id|payment_?id|payment_?intent|stripe_?transaction_?id|transaction_?id|transaction)$/i, values);
+  const keyPattern = /^(charge_?id|payment_?id|payment_?intent|payment_?transaction_?id|stripe_?transaction_?id|transaction_?id|transaction)$/i;
+  collectNamedValues(submission, keyPattern, values);
+  for (const payment of payments) collectNamedValues(payment, keyPattern, values);
   return values.map((value) => value.trim()).find((value) => value.length >= 6) || null;
 }
 
-function extractTotalCents(payments: unknown[]) {
+function extractTotalCents(valuesToInspect: unknown[]) {
   const values: unknown[] = [];
   const visit = (value: unknown, visited = new Set<object>()) => {
     if (Array.isArray(value)) {
@@ -162,12 +180,20 @@ function extractTotalCents(payments: unknown[]) {
       visit(child, visited);
     }
   };
-  for (const payment of payments) visit(payment);
+  for (const value of valuesToInspect) visit(value);
   for (const value of values) {
     const cents = currencyToCents(value);
     if (cents != null) return cents;
   }
   return null;
+}
+
+function ballotAnswers(submission: JotformSubmission) {
+  return Object.values(submission.answers || {}).filter((value) => {
+    const record = asRecord(value);
+    if (!record) return false;
+    return /contestant|vote|quantity|payment|product|stripe/i.test(`${String(record.type || "")} ${String(record.text || "")} ${String(record.name || "")}`);
+  });
 }
 
 export function parseVoteSubmission(submission: JotformSubmission, pricePerVoteCents = 250): ParsedVoteSubmission {
@@ -176,27 +202,33 @@ export function parseVoteSubmission(submission: JotformSubmission, pricePerVoteC
   }
 
   const payments = paymentAnswers(submission);
+  const ballot = ballotAnswers(submission);
   const statuses = extractStatuses(submission, payments);
   if (statuses.some((status) => INELIGIBLE_STATUS_PATTERN.test(status))) {
-    return { eligible: false, reason: "ineligible-payment-status", transactionId: null, totalCents: extractTotalCents(payments), votesByContestantNumber: new Map() };
-  }
-  if (!statuses.some((status) => SUCCESS_STATUSES.has(status))) {
-    return { eligible: false, reason: "payment-not-confirmed", transactionId: null, totalCents: extractTotalCents(payments), votesByContestantNumber: new Map() };
+    return { eligible: false, reason: "ineligible-payment-status", transactionId: null, totalCents: extractTotalCents([submission, ...payments]), votesByContestantNumber: new Map() };
   }
 
   const transactionId = extractTransactionId(submission, payments);
   if (!transactionId) {
-    return { eligible: false, reason: "missing-transaction-id", transactionId: null, totalCents: extractTotalCents(payments), votesByContestantNumber: new Map() };
+    return { eligible: false, reason: statuses.some((status) => SUCCESS_STATUSES.has(status)) ? "missing-transaction-id" : "payment-not-confirmed", transactionId: null, totalCents: extractTotalCents([submission, ...payments]), votesByContestantNumber: new Map() };
   }
 
   const votesByContestantNumber = new Map<number, number>();
   for (const payment of payments) extractProducts(payment, votesByContestantNumber);
+  if (!votesByContestantNumber.size) {
+    for (const answer of ballot) extractProducts(answer, votesByContestantNumber);
+  }
+  const totalCents = extractTotalCents([submission, ...payments]);
+  const parsedVoteCount = [...votesByContestantNumber.values()].reduce((sum, value) => sum + value, 0);
+  if (votesByContestantNumber.size === 1 && parsedVoteCount === 1 && !ballot.some((answer) => hasExplicitQuantity(answer)) && totalCents && totalCents % pricePerVoteCents === 0) {
+    const [number] = votesByContestantNumber.keys();
+    votesByContestantNumber.set(number, totalCents / pricePerVoteCents);
+  }
   const voteCount = [...votesByContestantNumber.values()].reduce((sum, value) => sum + value, 0);
   if (!voteCount) {
-    return { eligible: false, reason: "missing-product-quantity", transactionId, totalCents: extractTotalCents(payments), votesByContestantNumber };
+    return { eligible: false, reason: "missing-product-quantity", transactionId, totalCents, votesByContestantNumber };
   }
 
-  const totalCents = extractTotalCents(payments);
   const expectedCents = voteCount * pricePerVoteCents;
   if (totalCents == null) {
     return { eligible: false, reason: "missing-payment-total", transactionId, totalCents, votesByContestantNumber };
@@ -216,11 +248,13 @@ export function aggregateVerifiedVotes(submissions: JotformSubmission[], pricePe
     unresolvedSubmissions: 0,
     votesByContestantNumber: new Map(),
     unresolvedSubmissionIds: [],
+    reasonCounts: {},
   };
   const countedTransactionIds = new Set<string>();
 
   for (const submission of submissions) {
     const parsed = parseVoteSubmission(submission, pricePerVoteCents);
+    result.reasonCounts[parsed.reason] = (result.reasonCounts[parsed.reason] || 0) + 1;
     if (!parsed.eligible) {
       if (["deleted", "ineligible-payment-status", "payment-not-confirmed"].includes(parsed.reason)) result.ignoredSubmissions += 1;
       else {
