@@ -89,6 +89,20 @@ test("reads paymentTransactionId and derives a single-contestant quantity from t
   assert.equal(parsed.totalCents, 2500);
 });
 
+test("counts active Jotform payment-form submissions when its API omits private gateway fields", () => {
+  const parsed = parseVoteSubmission({
+    id: "1012",
+    status: "ACTIVE",
+    answers: {
+      20: { type: "control_number", text: "Contestant #087 - Example", answer: "12" },
+    },
+  });
+  assert.equal(parsed.eligible, true);
+  assert.equal(parsed.transactionId, "jotform-submission:1012");
+  assert.equal(parsed.votesByContestantNumber.get(87), 12);
+  assert.equal(parsed.totalCents, 3000);
+});
+
 test("keeps the ballot closed outside the official voting window", () => {
   assert.equal(desiredJotformVotingStatus(new Date("2026-08-27T09:59:59.999Z")), "Disabled");
   assert.equal(desiredJotformVotingStatus(new Date("2026-08-27T10:00:00.000Z")), "Enabled");

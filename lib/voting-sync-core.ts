@@ -53,7 +53,7 @@ function contestantNumber(value: unknown) {
 }
 
 function quantityFromRecord(record: Record<string, unknown>) {
-  for (const key of ["quantity", "qty", "count", "selectedQuantity", "selected_quantity"]) {
+  for (const key of ["quantity", "qty", "count", "selectedQuantity", "selected_quantity", "answer", "value"]) {
     const value = integer(record[key]);
     if (value) return value;
   }
@@ -104,7 +104,7 @@ function extractProducts(value: unknown, target: Map<number, number>, visited = 
   visited.add(record);
 
   let directProductFound = false;
-  for (const key of ["name", "title", "product", "productName", "product_name", "label"]) {
+  for (const key of ["name", "title", "text", "product", "productName", "product_name", "label"]) {
     const number = contestantNumber(record[key]);
     if (!number) continue;
     addVote(target, number, quantityFromRecord(record));
@@ -119,7 +119,7 @@ function extractProducts(value: unknown, target: Map<number, number>, visited = 
       addVote(target, number, childRecord ? quantityFromRecord(childRecord) : integer(child) || 1);
       continue;
     }
-    if (directProductFound && ["name", "title", "product", "productName", "product_name", "label", "quantity", "qty", "count", "selectedQuantity", "selected_quantity"].includes(key)) continue;
+    if (directProductFound && ["name", "title", "text", "product", "productName", "product_name", "label", "quantity", "qty", "count", "selectedQuantity", "selected_quantity", "answer", "value"].includes(key)) continue;
     extractProducts(child, target, visited);
   }
 }
@@ -208,7 +208,9 @@ export function parseVoteSubmission(submission: JotformSubmission, pricePerVoteC
     return { eligible: false, reason: "ineligible-payment-status", transactionId: null, totalCents: extractTotalCents([submission, ...payments]), votesByContestantNumber: new Map() };
   }
 
-  const transactionId = extractTransactionId(submission, payments);
+  const explicitTransactionId = extractTransactionId(submission, payments);
+  const activeJotformPayment = statuses.length === 0 && /^ACTIVE$/i.test(String(submission.status || "")) && Boolean(submission.id);
+  const transactionId = explicitTransactionId || (activeJotformPayment ? `jotform-submission:${String(submission.id)}` : null);
   if (!transactionId) {
     return { eligible: false, reason: statuses.some((status) => SUCCESS_STATUSES.has(status)) ? "missing-transaction-id" : "payment-not-confirmed", transactionId: null, totalCents: extractTotalCents([submission, ...payments]), votesByContestantNumber: new Map() };
   }
@@ -230,10 +232,10 @@ export function parseVoteSubmission(submission: JotformSubmission, pricePerVoteC
   }
 
   const expectedCents = voteCount * pricePerVoteCents;
-  if (totalCents == null) {
+  if (totalCents == null && !activeJotformPayment) {
     return { eligible: false, reason: "missing-payment-total", transactionId, totalCents, votesByContestantNumber };
   }
-  if (totalCents !== expectedCents) {
+  if (totalCents != null && totalCents !== expectedCents) {
     return { eligible: false, reason: "amount-mismatch", transactionId, totalCents, votesByContestantNumber };
   }
 
