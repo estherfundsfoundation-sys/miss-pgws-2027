@@ -3,7 +3,7 @@
   "crons": [
     {
       "path": "/api/voting/reconcile",
-      "schedule": "17 4 * * *"
+      "schedule": "* * * * *"
     },
     {
       "path": "/api/voting/status",
