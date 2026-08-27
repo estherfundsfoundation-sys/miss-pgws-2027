@@ -108,6 +108,11 @@ async function jotformFormState(formId: string, apiKey: string) {
   };
 }
 
+export async function getJotformVotingFormState() {
+  const { apiKey, formId } = jotformConfig();
+  return { formId, ...(await jotformFormState(formId, apiKey)) };
+}
+
 export async function setJotformVotingFormStatus(status: "Enabled" | "Disabled") {
   const { apiKey, formId } = jotformConfig();
   const body = new URLSearchParams();
