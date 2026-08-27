@@ -114,6 +114,27 @@ export async function getJotformVotingFormState() {
   return { formId, ...(await jotformFormState(formId, apiKey)) };
 }
 
+export async function getJotformVotingProductSchema() {
+  const { apiKey, formId } = jotformConfig();
+  const questions = await jotformRequest(`/form/${formId}/questions`, apiKey) as Record<string, Record<string, unknown>>;
+  const payment = Object.values(questions || {}).find((question) => String(question?.type || "").includes("stripe"));
+  if (!payment) return { questionFound: false };
+  const rawProducts = payment.products;
+  let products: unknown = rawProducts;
+  if (typeof rawProducts === "string") {
+    try { products = JSON.parse(rawProducts); } catch { /* retain raw string */ }
+  }
+  const entries = Array.isArray(products) ? products : products && typeof products === "object" ? Object.values(products as Record<string, unknown>) : [];
+  return {
+    questionFound: true,
+    qid: String(payment.qid || ""),
+    questionKeys: Object.keys(payment),
+    productsType: typeof rawProducts,
+    productCount: entries.length,
+    sample: entries[0] || null,
+  };
+}
+
 export async function setJotformVotingFormStatus(status: "Enabled" | "Disabled") {
   const { apiKey, formId } = jotformConfig();
   const body = new URLSearchParams();
