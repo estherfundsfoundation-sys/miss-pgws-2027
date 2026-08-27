@@ -101,6 +101,7 @@ async function jotformFormState(formId: string, apiKey: string) {
   ]);
   return {
     formStatus: String(form?.status || "").toUpperCase(),
+    propertyStatus: String(properties?.status || ""),
     disabled: String(properties?.disabled || ""),
     expireDate: String(properties?.expireDate || ""),
     expiredDate: String(properties?.expiredDate || ""),
@@ -116,15 +117,16 @@ export async function getJotformVotingFormState() {
 export async function setJotformVotingFormStatus(status: "Enabled" | "Disabled") {
   const { apiKey, formId } = jotformConfig();
   const body = new URLSearchParams();
+  body.set("properties[status]", status);
   body.set("properties[disabled]", status);
   await jotformFormRequest(`/form/${formId}/properties`, apiKey, body);
   let state = await jotformFormState(formId, apiKey);
   const expected = status.toUpperCase();
-  if (state.formStatus !== expected || state.disabled.toUpperCase() !== expected) {
-    await jotformJsonRequest(`/form/${formId}/properties`, apiKey, { properties: { disabled: status } });
+  if (state.formStatus !== expected) {
+    await jotformJsonRequest(`/form/${formId}/properties`, apiKey, { properties: { status, disabled: status } });
     state = await jotformFormState(formId, apiKey);
   }
-  if (state.formStatus !== expected || state.disabled.toUpperCase() !== expected) {
+  if (state.formStatus !== expected) {
     throw new Error(`Jotform ballot status did not change to ${status}.`);
   }
   return { formId, status, ...state, updatedAt: new Date().toISOString() };
