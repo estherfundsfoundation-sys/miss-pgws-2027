@@ -104,7 +104,7 @@ const milestones: Milestone[] = [
     id: "voting-opens",
     number: "06",
     date: "AUGUST 27",
-    time: "12:00 PM ET",
+    time: "6:00 AM ET",
     owner: "EVERYONE",
     title: "Voting and campaign week open",
     summary: "Rally your campus, church, organizations, family, alumni, and community around the mission. Every verified vote is $2.50 through the official voting form.",
@@ -149,7 +149,7 @@ const milestones: Milestone[] = [
 const countdownEvents = [
   { label: "your announcement post", at: "2026-08-26T10:00:00-04:00" },
   { label: "your campaign video post", at: "2026-08-27T10:00:00-04:00" },
-  { label: "voting opening", at: "2026-08-27T12:00:00-04:00" },
+  { label: "voting opening", at: "2026-08-27T06:00:00-04:00" },
   { label: "voting closing", at: "2026-09-03T23:59:00-04:00" },
 ];
 

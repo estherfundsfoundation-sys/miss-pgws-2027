@@ -17,7 +17,7 @@ export const campaignDates = [
   ["Foundation contestant reveals", "August 25–26, 2026"],
   ["Contestant announcement graphic", "August 26, 2026 · 10:00 AM ET"],
   ["Official campaign video post", "August 27, 2026 · 10:00 AM ET"],
-  ["Voting opens", "August 27, 2026 · 12:00 PM ET"],
+  ["Voting opens", "August 27, 2026 · 6:00 AM ET"],
   ["Campaign week", "August 27–September 3, 2026"],
   ["Voting closes", "September 3, 2026 · 11:59 PM ET"],
   ["Final verification and winners announced", "September 4, 2026"],

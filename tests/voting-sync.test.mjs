@@ -67,8 +67,8 @@ test("counts a Stripe transaction only once", () => {
 });
 
 test("keeps the ballot closed outside the official voting window", () => {
-  assert.equal(desiredJotformVotingStatus(new Date("2026-08-27T15:59:59.999Z")), "Disabled");
-  assert.equal(desiredJotformVotingStatus(new Date("2026-08-27T16:00:00.000Z")), "Enabled");
+  assert.equal(desiredJotformVotingStatus(new Date("2026-08-27T09:59:59.999Z")), "Disabled");
+  assert.equal(desiredJotformVotingStatus(new Date("2026-08-27T10:00:00.000Z")), "Enabled");
   assert.equal(desiredJotformVotingStatus(new Date("2026-09-04T03:59:59.999Z")), "Enabled");
   assert.equal(desiredJotformVotingStatus(new Date("2026-09-04T04:00:00.000Z")), "Disabled");
 });

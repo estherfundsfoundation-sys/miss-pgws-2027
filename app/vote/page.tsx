@@ -35,7 +35,7 @@ export default function VotePage() {
           </div>
           <div className="official-ballot-window">
             <strong>Voting opens</strong>
-            <span>August 27, 2026 · 12:00 PM ET</span>
+            <span>August 27, 2026 · 6:00 AM ET</span>
             <strong>Voting closes</strong>
             <span>September 3, 2026 · 11:59 PM ET</span>
           </div>

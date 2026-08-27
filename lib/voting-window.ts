@@ -1,4 +1,4 @@
-export const VOTING_OPENS_AT = "2026-08-27T16:00:00.000Z";
+export const VOTING_OPENS_AT = "2026-08-27T10:00:00.000Z";
 export const VOTING_CLOSES_AT = "2026-09-04T03:59:59.999Z";
 
 export function isVotingWindowOpen(now = new Date()) {
