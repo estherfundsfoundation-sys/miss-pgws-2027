@@ -274,21 +274,30 @@ export async function getVotingLeaderboard() {
     databaseFetch("pgws_platform_settings?singleton=eq.true&select=voting_open&limit=1"),
   ]) as [Row[], Row[], Row[]];
   const totalsByContestant = new Map(totals.map((row) => [String(row.contestant_id), row]));
+  const ranked = contestants.map((contestant) => ({
+    id: contestant.id,
+    public_slug: contestant.public_slug,
+    public_name: contestant.public_name,
+    college: contestant.college,
+    contestant_number: contestant.contestant_number,
+    headshot_public_path: contestant.headshot_public_path,
+    public_profile_status: contestant.public_profile_status,
+    verified_votes: Number(totalsByContestant.get(String(contestant.id))?.verified_votes || 0),
+    verified_amount_cents: Number(totalsByContestant.get(String(contestant.id))?.verified_amount_cents || 0),
+    provisional_rank: null as number | null,
+    last_synced_at: totalsByContestant.get(String(contestant.id))?.last_synced_at ?? null,
+    audit_status: totalsByContestant.get(String(contestant.id))?.audit_status || "provisional",
+  })).filter((contestant) => contestant.verified_votes > 0)
+    .sort((a, b) => b.verified_votes - a.verified_votes || Number(a.contestant_number || 999) - Number(b.contestant_number || 999));
+  let priorVotes: number | null = null;
+  let priorRank: number | null = null;
+  ranked.forEach((contestant, index) => {
+    contestant.provisional_rank = contestant.verified_votes === priorVotes ? priorRank : index + 1;
+    priorVotes = contestant.verified_votes;
+    priorRank = contestant.provisional_rank;
+  });
   return {
     adminVotingOpen: Boolean(settings[0]?.voting_open),
-    rows: contestants.map((contestant) => ({
-      id: contestant.id,
-      public_slug: contestant.public_slug,
-      public_name: contestant.public_name,
-      college: contestant.college,
-      contestant_number: contestant.contestant_number,
-      headshot_public_path: contestant.headshot_public_path,
-      public_profile_status: contestant.public_profile_status,
-      verified_votes: Number(totalsByContestant.get(String(contestant.id))?.verified_votes || 0),
-      verified_amount_cents: Number(totalsByContestant.get(String(contestant.id))?.verified_amount_cents || 0),
-      provisional_rank: totalsByContestant.get(String(contestant.id))?.provisional_rank ?? null,
-      last_synced_at: totalsByContestant.get(String(contestant.id))?.last_synced_at ?? null,
-      audit_status: totalsByContestant.get(String(contestant.id))?.audit_status || "provisional",
-    })),
+    rows: ranked,
   };
 }

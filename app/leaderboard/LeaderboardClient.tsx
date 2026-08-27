@@ -84,6 +84,7 @@ export function LeaderboardClient() {
           audit_status: "provisional" as const,
         }),
       }))
+      .filter((row) => row.verified_votes > 0)
       .sort((a, b) => b.verified_votes - a.verified_votes || (a.contestant_number || 999) - (b.contestant_number || 999) || (a.public_name || "").localeCompare(b.public_name || ""))
       .map((row) => ({ ...row, display_rank: row.provisional_rank || 0 }));
   }, [contestants, totals]);
@@ -105,11 +106,11 @@ export function LeaderboardClient() {
     {error && <div className="notice"><span>◆</span><div><strong>The live totals could not load.</strong><br />{error}</div></div>}
 
     <div className="leaderboard-tools">
-      <div><p className="eyebrow">OFFICIAL CONTESTANT RANKINGS</p><h2>{leaders.length || 142} women. One purpose.</h2></div>
+      <div><p className="eyebrow">OFFICIAL CONTESTANT RANKINGS</p><h2>{leaders.length ? `${leaders.length} currently ranked` : "Rankings begin with the first verified vote"}.</h2></div>
       <label className="field"><span>Find a contestant, number, or school</span><input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search the leaderboard…" /></label>
     </div>
 
-    {!leaders.length ? <div className="leaderboard-state"><strong>Contestant profiles are preparing for publication.</strong><span>The official roster will connect here as profiles are approved.</span></div> : <div className="leaderboard-list">
+    {!leaders.length ? <div className="leaderboard-state"><strong>No verified votes are displayed yet.</strong><span>A contestant will appear here after she has a published profile and receives her first successfully paid, verified vote.</span></div> : <div className="leaderboard-list">
       {visible.map((row) => <article className="leader-row leader-row--live" key={row.id}>
         <div className="leader-rank" aria-label={row.display_rank ? `Rank ${row.display_rank}` : "Not ranked yet"}>{row.display_rank || "—"}</div>
         <Link className="leader-photo" href={profileHref(row)} aria-label={`Open ${row.public_name || "contestant"} profile`}>
