@@ -23,6 +23,9 @@ export async function GET(request: NextRequest) {
       verifiedVotes: result.verifiedVotes,
       unresolvedSubmissions: result.unresolvedSubmissions,
       reasonCounts: result.reasonCounts,
+      supporterAlertsSent: result.supporterAlertsSent,
+      supporterAlertsSkipped: result.supporterAlertsSkipped,
+      supporterAlertsFailed: result.supporterAlertsFailed,
     }));
     return NextResponse.json({ success: true, ...result });
   } catch (reason) {
