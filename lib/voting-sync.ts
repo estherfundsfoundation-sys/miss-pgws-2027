@@ -1,11 +1,15 @@
-import { aggregateVerifiedVotes, type JotformSubmission } from "./voting-sync-core";
+import { createHash } from "node:crypto";
+import { aggregateVerifiedVotes, parseVoteSubmission, type JotformSubmission } from "./voting-sync-core";
 
 type Row = Record<string, unknown>;
-type ContestantRow = { id: string; contestant_number: number | null; public_name: string | null };
+type ContestantRow = { id: string; user_id: string; contestant_number: number | null; public_name: string | null };
 
 const DEFAULT_FORM_ID = "262258169740160";
 const PRICE_PER_VOTE_CENTS = 250;
 const AUTHORITATIVE_PRODUCT_SNAPSHOT_AT = Date.parse("2026-08-27T20:39:58-04:00");
+const SUPPORTER_ALERTS_BEGIN_AT = Date.parse("2026-08-27T20:53:25-04:00");
+const SUPPORTER_ALERT_ACTION = "vote_supporter_alert_sent";
+const NATIONALS_EMAIL = "nationals@estherfundsinc.org";
 const AUTHORITATIVE_PRODUCT_SNAPSHOT = new Map<number, number>([
   [49, 222], [120, 115], [16, 93], [29, 58], [73, 39], [70, 35], [116, 33], [114, 31],
   [2, 17], [82, 16], [30, 16], [109, 11], [71, 11], [103, 11], [19, 10], [50, 6],
@@ -181,7 +185,71 @@ export async function fetchVotingSubmissions() {
 }
 
 async function contestantRows() {
-  return await databaseFetch("pgws_contestants?contestant_number=not.is.null&select=id,contestant_number,public_name,pgws_applications!inner(status)&pgws_applications.status=eq.accepted&order=contestant_number.asc") as ContestantRow[];
+  return await databaseFetch("pgws_contestants?contestant_number=not.is.null&select=id,user_id,contestant_number,public_name,pgws_applications!inner(status)&pgws_applications.status=eq.accepted&order=contestant_number.asc") as ContestantRow[];
+}
+
+function answerRecord(submission: JotformSubmission, text: RegExp) {
+  for (const value of Object.values(submission.answers || {})) {
+    if (!value || typeof value !== "object" || Array.isArray(value)) continue;
+    const record = value as Record<string, unknown>;
+    if (text.test(String(record.text || ""))) return record.answer;
+  }
+  return null;
+}
+
+function donorRecognition(submission: JotformSubmission) {
+  const preference = answerRecord(submission, /Donor Recognition Preference/i);
+  const consented = JSON.stringify(preference || "").toLowerCase().includes("share my first name");
+  const name = answerRecord(submission, /Donor Full Name/i);
+  const first = name && typeof name === "object" && !Array.isArray(name) ? String((name as Record<string, unknown>).first || "").trim() : "";
+  return consented && first ? first : "An anonymous supporter";
+}
+
+function escapeHtml(value: unknown) {
+  return String(value ?? "").replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]!);
+}
+
+async function sendSupporterAlerts(submissions: JotformSubmission[], contestants: ContestantRow[]) {
+  const resendKey = process.env.RESEND_API_KEY?.trim();
+  if (!resendKey) return { supporterAlertsSent: 0, supporterAlertsSkipped: 0, supporterAlertsFailed: 0 };
+  const eligible = submissions.map((submission) => ({ submission, parsed: parseVoteSubmission(submission, PRICE_PER_VOTE_CENTS) }))
+    .filter(({ submission, parsed }) => submissionTime(submission.created_at) >= SUPPORTER_ALERTS_BEGIN_AT && parsed.eligible && parsed.transactionId && parsed.votesByContestantNumber.size === 1);
+  if (!eligible.length) return { supporterAlertsSent: 0, supporterAlertsSkipped: 0, supporterAlertsFailed: 0 };
+
+  const audits = await databaseFetch(`pgws_audit_log?action=eq.${SUPPORTER_ALERT_ACTION}&select=entity_id&limit=5000`) as Array<{ entity_id: string }>;
+  const sent = new Set(audits.map((audit) => audit.entity_id));
+  const userIds = [...new Set(contestants.map((contestant) => contestant.user_id))];
+  const profiles = await databaseFetch(`pgws_profiles?user_id=in.(${userIds.map(encodeURIComponent).join(",")})&select=user_id,email&limit=5000`) as Array<{ user_id: string; email: string }>;
+  const emailByUser = new Map(profiles.map((profile) => [profile.user_id, profile.email]));
+  const contestantByNumber = new Map(contestants.map((contestant) => [Number(contestant.contestant_number), contestant]));
+  let supporterAlertsSent = 0;
+  let supporterAlertsSkipped = 0;
+  let supporterAlertsFailed = 0;
+
+  for (const { submission, parsed } of eligible) {
+    const transactionId = parsed.transactionId!;
+    if (sent.has(transactionId)) { supporterAlertsSkipped += 1; continue; }
+    const [contestantNumber, votes] = [...parsed.votesByContestantNumber.entries()][0];
+    const contestant = contestantByNumber.get(contestantNumber);
+    const recipient = contestant ? emailByUser.get(contestant.user_id)?.trim() : "";
+    if (!contestant || !recipient) { supporterAlertsFailed += 1; continue; }
+    const supporter = donorRecognition(submission);
+    const amount = ((parsed.totalCents || votes * PRICE_PER_VOTE_CENTS) / 100).toFixed(2);
+    const queenName = contestant.public_name || `Contestant #${String(contestantNumber).padStart(3, "0")}`;
+    const subject = `${votes} new vote${votes === 1 ? "" : "s"} for you, Pretty Girl!`;
+    const text = `Hi ${queenName},\n\n${supporter} just supported your campaign with ${votes} vote${votes === 1 ? "" : "s"} ($${amount}).\n\nKeep going, Pretty Girl—your community is cheering you on!\n\nView the live leaderboard: https://misspgws.estherfundsfoundation.org/leaderboard\n\nWith love,\nPretty Girls Who Serve`;
+    const html = `<div style="font-family:Arial,sans-serif;color:#231327;line-height:1.6"><h1 style="color:#c92d72">You received new votes, Pretty Girl!</h1><p>Hi ${escapeHtml(queenName)},</p><p><strong>${escapeHtml(supporter)}</strong> just supported your campaign with <strong>${votes} vote${votes === 1 ? "" : "s"}</strong> ($${amount}).</p><p>Keep going, Pretty Girl—your community is cheering you on!</p><p><a href="https://misspgws.estherfundsfoundation.org/leaderboard" style="background:#c92d72;color:white;padding:12px 18px;border-radius:999px;text-decoration:none">View the live leaderboard</a></p><p>With love,<br><strong>Pretty Girls Who Serve</strong></p></div>`;
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json", "Idempotency-Key": `pgws_vote_${createHash("sha256").update(transactionId).digest("hex")}` },
+      body: JSON.stringify({ from: process.env.EMAIL_FROM ?? "Pretty Girls Who Serve <notifications@estherfundsinc.org>", to: [recipient], cc: [NATIONALS_EMAIL], reply_to: NATIONALS_EMAIL, subject, html, text }),
+    });
+    const provider = await response.json().catch(() => null) as { id?: string; message?: string } | null;
+    if (!response.ok) { supporterAlertsFailed += 1; continue; }
+    await databaseFetch("pgws_audit_log", { method: "POST", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ action: SUPPORTER_ALERT_ACTION, entity_type: "vote_transaction", entity_id: transactionId, new_value: { contestant_id: contestant.id, contestant_number: contestantNumber, recipient, votes, amount_cents: parsed.totalCents, supporter_display: supporter, provider_id: provider?.id || null }, reason: "Automatic paid-vote supporter alert sent to contestant and copied to nationals." }) });
+    supporterAlertsSent += 1;
+  }
+  return { supporterAlertsSent, supporterAlertsSkipped, supporterAlertsFailed };
 }
 
 async function fetchVotingBallotConfiguration() {
@@ -262,6 +330,8 @@ export async function syncVerifiedVotes({ dryRun = false }: { dryRun?: boolean }
     });
   }
 
+  const supporterAlerts = dryRun ? { supporterAlertsSent: 0, supporterAlertsSkipped: 0, supporterAlertsFailed: 0 } : await sendSupporterAlerts(submissions, contestants);
+
   const verifiedVotes = [...aggregation.votesByContestantNumber.values()].reduce((sum, value) => sum + value, 0);
   return {
     dryRun,
@@ -284,6 +354,7 @@ export async function syncVerifiedVotes({ dryRun = false }: { dryRun?: boolean }
     verifiedVotes,
     verifiedAmountCents: verifiedVotes * PRICE_PER_VOTE_CENTS,
     unmatchedContestantNumbers,
+    ...supporterAlerts,
     syncedAt,
   };
 }
