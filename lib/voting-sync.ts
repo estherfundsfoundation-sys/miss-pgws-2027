@@ -4,7 +4,7 @@ import { aggregateVerifiedVotes, parseVoteSubmission, type JotformSubmission } f
 type Row = Record<string, unknown>;
 type ContestantRow = { id: string; user_id: string; contestant_number: number | null; public_name: string | null };
 
-const DEFAULT_FORM_ID = "262258169740160";
+const DEFAULT_FORM_ID = "262396396023159";
 const PRICE_PER_VOTE_CENTS = 250;
 const AUTHORITATIVE_PRODUCT_SNAPSHOT_AT = Date.parse("2026-08-28T06:37:20-04:00");
 const SUPPORTER_ALERTS_BEGIN_AT = Date.parse("2026-08-27T20:53:25-04:00");

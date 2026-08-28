@@ -13,8 +13,8 @@
     "canonicalDomain": "misspgws.estherfundsfoundation.org",
     "urls": {
       "interestGroupMe": "mailto:nationals@estherfundsinc.org?subject=Miss%20PGWS%202027%20community%20chat%20access",
-      "jotformVoting": "https://pci.jotform.com/form/262258169740160",
-      "jotformVotingFormId": "262258169740160",
+      "jotformVoting": "https://pci.jotform.com/form/262396396023159",
+      "jotformVotingFormId": "262396396023159",
       "estherFundsFoundation": "https://www.estherfundsfoundation.org"
     }
   },
@@ -550,8 +550,8 @@
     }
   },
   "voting": {
-    "jotformUrl": "https://pci.jotform.com/form/262258169740160",
-    "jotformFormId": "262258169740160",
+    "jotformUrl": "https://pci.jotform.com/form/262396396023159",
+    "jotformFormId": "262396396023159",
     "pricePerVoteUsd": 2.5,
     "priceDisplay": "$2.50 per vote",
     "verifiedVotingWeightPercent": 85,
