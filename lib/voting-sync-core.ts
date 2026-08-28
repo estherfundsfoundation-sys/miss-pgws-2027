@@ -70,9 +70,11 @@ function parsedJsonRecord(value: unknown) {
 }
 
 function jotformStripePayment(submission: JotformSubmission, pricePerVoteCents: number) {
+  let sawIncompleteLiveCatalog = false;
   for (const answer of Object.values(submission.answers || {})) {
     const answerRecord = asRecord(answer);
     if (!answerRecord || !/stripe|payment/i.test(String(answerRecord.type || ""))) continue;
+    if (/^My Products$/i.test(String(answerRecord.text || "").trim())) sawIncompleteLiveCatalog = true;
     const answerValue = asRecord(answerRecord.answer);
     const payment = parsedJsonRecord(answerValue?.paymentArray);
     if (!payment) continue;
@@ -100,6 +102,9 @@ function jotformStripePayment(submission: JotformSubmission, pricePerVoteCents: 
       totalCents,
       votesByContestantNumber: new Map([[numbers[0], totalCents / pricePerVoteCents]]),
     };
+  }
+  if (sawIncompleteLiveCatalog) {
+    return { eligible: false, reason: "payment-not-confirmed", transactionId: null, totalCents: null, votesByContestantNumber: new Map<number, number>() };
   }
   return null;
 }

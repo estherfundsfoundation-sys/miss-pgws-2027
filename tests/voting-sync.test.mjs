@@ -89,18 +89,17 @@ test("reads paymentTransactionId and derives a single-contestant quantity from t
   assert.equal(parsed.totalCents, 2500);
 });
 
-test("counts active Jotform payment-form submissions when its API omits private gateway fields", () => {
+test("rejects an incomplete live Stripe answer instead of scanning its hidden catalog", () => {
   const parsed = parseVoteSubmission({
     id: "1012",
     status: "ACTIVE",
     answers: {
-      20: { type: "control_number", text: "Contestant #087 - Example", answer: "12" },
+      3: { type: "control_stripe", text: "My Products", answer: { 0: JSON.stringify({ id: "91" }), 1: JSON.stringify({ name: "Contestant #087 - Example" }) } },
     },
   });
-  assert.equal(parsed.eligible, true);
-  assert.equal(parsed.transactionId, "jotform-submission:1012");
-  assert.equal(parsed.votesByContestantNumber.get(87), 12);
-  assert.equal(parsed.totalCents, 3000);
+  assert.equal(parsed.eligible, false);
+  assert.equal(parsed.reason, "payment-not-confirmed");
+  assert.equal(parsed.votesByContestantNumber.size, 0);
 });
 
 test("reads the live Jotform paymentArray without counting the hidden product catalog", () => {

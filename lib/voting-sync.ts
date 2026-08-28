@@ -6,15 +6,15 @@ type ContestantRow = { id: string; user_id: string; contestant_number: number | 
 
 const DEFAULT_FORM_ID = "262258169740160";
 const PRICE_PER_VOTE_CENTS = 250;
-const AUTHORITATIVE_PRODUCT_SNAPSHOT_AT = Date.parse("2026-08-27T20:39:58-04:00");
+const AUTHORITATIVE_PRODUCT_SNAPSHOT_AT = Date.parse("2026-08-28T06:37:20-04:00");
 const SUPPORTER_ALERTS_BEGIN_AT = Date.parse("2026-08-27T20:53:25-04:00");
 const SUPPORTER_ALERT_ACTION = "vote_supporter_alert_sent";
 const NATIONALS_EMAIL = "nationals@estherfundsinc.org";
 const AUTHORITATIVE_PRODUCT_SNAPSHOT = new Map<number, number>([
-  [49, 222], [120, 115], [16, 93], [29, 58], [73, 39], [70, 35], [116, 33], [114, 31],
-  [2, 17], [82, 16], [30, 16], [109, 11], [71, 11], [103, 11], [19, 10], [50, 6],
-  [92, 5], [91, 5], [3, 5], [140, 4], [143, 3], [61, 2], [142, 2], [33, 2], [25, 1],
-  [10, 1], [11, 1], [51, 1], [46, 1],
+  [49, 244], [16, 149], [120, 120], [73, 112], [29, 74], [140, 49], [70, 36], [25, 33],
+  [116, 33], [114, 32], [2, 28], [30, 28], [82, 19], [91, 15], [61, 12], [109, 11],
+  [71, 11], [103, 11], [19, 10], [50, 6], [92, 5], [3, 5], [143, 3], [6, 2], [65, 2],
+  [142, 2], [33, 2], [4, 1], [117, 1], [10, 1], [11, 1], [51, 1], [46, 1],
 ]);
 
 function submissionTime(value: unknown) {
