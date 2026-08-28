@@ -8,15 +8,18 @@ const LEGACY_FORM_ID = "262258169740160";
 const DEFAULT_FORM_ID = "262396396023159";
 const VOTING_FORM_IDS = [LEGACY_FORM_ID, DEFAULT_FORM_ID] as const;
 const PRICE_PER_VOTE_CENTS = 250;
-const AUTHORITATIVE_PRODUCT_SNAPSHOT_AT = Date.parse("2026-08-28T06:37:20-04:00");
+// Payment-audited baseline across both ballots. It includes only successfully
+// paid, single-contestant transactions through this timestamp. Ambiguous
+// multi-contestant payments are deliberately quarantined for manual review.
+const AUTHORITATIVE_PRODUCT_SNAPSHOT_AT = Date.parse("2026-08-28T21:57:03.291Z");
 const SUPPORTER_ALERTS_BEGIN_AT = Date.parse("2026-08-27T20:53:25-04:00");
 const SUPPORTER_ALERT_ACTION = "vote_supporter_alert_sent";
 const NATIONALS_EMAIL = "nationals@estherfundsinc.org";
 const AUTHORITATIVE_PRODUCT_SNAPSHOT = new Map<number, number>([
-  [49, 244], [16, 149], [120, 120], [73, 112], [29, 74], [140, 49], [70, 36], [25, 33],
-  [116, 33], [114, 32], [2, 28], [30, 28], [82, 19], [91, 15], [61, 12], [109, 11],
-  [71, 11], [103, 11], [19, 10], [50, 6], [92, 5], [3, 5], [143, 3], [6, 2], [65, 2],
-  [142, 2], [33, 2], [4, 1], [117, 1], [10, 1], [11, 1], [51, 1], [46, 1],
+  [2, 63], [3, 5], [6, 14], [16, 160], [19, 10], [25, 43], [29, 89], [30, 28], [33, 2],
+  [35, 6], [46, 1], [49, 299], [50, 38], [61, 12], [65, 22], [70, 40], [71, 22], [73, 122],
+  [82, 19], [91, 16], [92, 5], [103, 11], [109, 11], [114, 36], [115, 3], [116, 41],
+  [120, 241], [140, 68], [142, 2], [143, 1],
 ]);
 
 function submissionTime(value: unknown) {
