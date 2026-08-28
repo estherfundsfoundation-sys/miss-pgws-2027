@@ -1,4 +1,4 @@
-import { aggregateVerifiedVotes, type JotformSubmission } from "./voting-sync-core";
+import { aggregateVerifiedVotes, parseVoteSubmission, type JotformSubmission } from "./voting-sync-core";
 
 type Row = Record<string, unknown>;
 type ContestantRow = { id: string; contestant_number: number | null; public_name: string | null };
@@ -217,6 +217,17 @@ export async function syncVerifiedVotes({ dryRun = false }: { dryRun?: boolean }
   const [submissions, contestants, ballotConfiguration] = await Promise.all([fetchVotingSubmissions(), contestantRows(), fetchVotingBallotConfiguration()]);
   if (!contestants.length) throw new Error("No numbered contestants are available for voting synchronization.");
   const aggregation = aggregateVerifiedVotes(submissions, PRICE_PER_VOTE_CENTS);
+  const diagnosticSamples = submissions.filter((submission) => /^ACTIVE$/i.test(String(submission.status || ""))).slice(-3).map((submission) => {
+    const parsed = parseVoteSubmission(submission, PRICE_PER_VOTE_CENTS);
+    const answers = Object.entries(submission.answers || {}).map(([qid, value]) => {
+      const record = value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
+      const answer = record.answer;
+      const safeAnswer = typeof answer === "number" ? answer : typeof answer === "string" && (/contestant/i.test(answer) || /^\s*\d+(?:\.\d+)?\s*$/.test(answer)) ? answer : answer && typeof answer === "object" ? JSON.stringify(answer, (key, child) => /email|name|address|phone|card/i.test(key) ? "[redacted]" : child).slice(0, 1600) : "[redacted]";
+      return { qid, type: record.type, text: record.text, safeAnswer };
+    });
+    return { id: submission.id, status: submission.status, topLevelKeys: Object.keys(submission), answers, parsed: { reason: parsed.reason, totalCents: parsed.totalCents, votes: Object.fromEntries(parsed.votesByContestantNumber) } };
+  });
+  console.info("[voting-shape]", JSON.stringify(diagnosticSamples));
   const knownNumbers = new Set(contestants.map((row) => Number(row.contestant_number)));
   const ballotNumbers = new Set<number>();
   for (const match of ballotConfiguration.matchAll(/\bContestant\s*#?\s*(\d{1,3})\b/gi)) ballotNumbers.add(Number(match[1]));
