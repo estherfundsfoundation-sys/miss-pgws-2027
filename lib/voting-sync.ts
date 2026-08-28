@@ -4,7 +4,9 @@ import { aggregateVerifiedVotes, parseVoteSubmission, type JotformSubmission } f
 type Row = Record<string, unknown>;
 type ContestantRow = { id: string; user_id: string; contestant_number: number | null; public_name: string | null };
 
+const LEGACY_FORM_ID = "262258169740160";
 const DEFAULT_FORM_ID = "262396396023159";
+const VOTING_FORM_IDS = [LEGACY_FORM_ID, DEFAULT_FORM_ID] as const;
 const PRICE_PER_VOTE_CENTS = 250;
 const AUTHORITATIVE_PRODUCT_SNAPSHOT_AT = Date.parse("2026-08-28T06:37:20-04:00");
 const SUPPORTER_ALERTS_BEGIN_AT = Date.parse("2026-08-27T20:53:25-04:00");
@@ -50,7 +52,10 @@ async function databaseFetch(path: string, init: RequestInit = {}) {
 
 function jotformConfig() {
   const apiKey = process.env.JOTFORM_API_KEY?.trim();
-  const formId = (process.env.JOTFORM_VOTING_FORM_ID || DEFAULT_FORM_ID).trim();
+  // The public ballot moved during live voting. Keep the current form fixed in
+  // code so a stale production environment variable cannot send donors or
+  // reconciliation back to the retired ballot.
+  const formId = DEFAULT_FORM_ID;
   if (!apiKey) throw new Error("Jotform synchronization is not configured.");
   if (!/^\d+$/.test(formId)) throw new Error("The Jotform voting form ID is invalid.");
   return { apiKey, formId };
@@ -172,14 +177,16 @@ export async function setJotformVotingFormStatus(status: "Enabled" | "Disabled")
 }
 
 export async function fetchVotingSubmissions() {
-  const { apiKey, formId } = jotformConfig();
+  const { apiKey } = jotformConfig();
   const submissions: JotformSubmission[] = [];
   const limit = 1000;
-  for (let offset = 0; ; offset += limit) {
-    const content = await jotformRequest(`/form/${formId}/submissions?limit=${limit}&offset=${offset}&orderby=created_at`, apiKey);
-    const page = Array.isArray(content) ? content as JotformSubmission[] : [];
-    submissions.push(...page);
-    if (page.length < limit) break;
+  for (const formId of VOTING_FORM_IDS) {
+    for (let offset = 0; ; offset += limit) {
+      const content = await jotformRequest(`/form/${formId}/submissions?limit=${limit}&offset=${offset}&orderby=created_at`, apiKey);
+      const page = Array.isArray(content) ? content as JotformSubmission[] : [];
+      submissions.push(...page);
+      if (page.length < limit) break;
+    }
   }
   return submissions;
 }
@@ -335,7 +342,8 @@ export async function syncVerifiedVotes({ dryRun = false }: { dryRun?: boolean }
   const verifiedVotes = [...aggregation.votesByContestantNumber.values()].reduce((sum, value) => sum + value, 0);
   return {
     dryRun,
-    formId: process.env.JOTFORM_VOTING_FORM_ID || DEFAULT_FORM_ID,
+    formId: DEFAULT_FORM_ID,
+    sourceFormIds: [...VOTING_FORM_IDS],
     contestantCount: contestants.length,
     ballotContestantCount: ballotNumbers.size,
     ballotRosterInspectable,
