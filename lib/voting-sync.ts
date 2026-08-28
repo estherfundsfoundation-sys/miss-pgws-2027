@@ -20,7 +20,7 @@ const AUTHORITATIVE_PRODUCT_SNAPSHOT = new Map<number, number>([
 function submissionTime(value: unknown) {
   const raw = String(value || "").trim();
   if (!raw) return Number.NaN;
-  const normalized = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(raw) ? `${raw.replace(" ", "T")}-04:00` : raw;
+  const normalized = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(raw) ? `${raw.replace(" ", "T")}Z` : raw;
   return Date.parse(normalized);
 }
 
