@@ -103,6 +103,36 @@ test("counts active Jotform payment-form submissions when its API omits private 
   assert.equal(parsed.totalCents, 3000);
 });
 
+test("reads the live Jotform paymentArray without counting the hidden product catalog", () => {
+  const selected = JSON.stringify({
+    product: ["Contestant 029 - McKenzye Webster (Amount: 2.50 USD)"],
+    total: "10.00",
+    transactionid: "pi_live_jotform_shape",
+    stripeData: { isCharged: true },
+    order: { status: "PAID", id: "order_live_jotform_shape" },
+  });
+  const parsed = parseVoteSubmission({
+    id: "1013",
+    status: "ACTIVE",
+    answers: {
+      3: {
+        type: "control_stripe",
+        text: "My Products",
+        answer: {
+          0: JSON.stringify({ id: "33" }),
+          1: JSON.stringify({ name: "Contestant 029 - McKenzye Webster", price: 2.5 }),
+          2: JSON.stringify({ name: "Contestant 120 - Paris Lynn Monderson", price: 2.5 }),
+          paymentArray: selected,
+        },
+      },
+    },
+  });
+  assert.equal(parsed.eligible, true);
+  assert.equal(parsed.transactionId, "pi_live_jotform_shape");
+  assert.equal(parsed.totalCents, 1000);
+  assert.deepEqual(Object.fromEntries(parsed.votesByContestantNumber), { 29: 4 });
+});
+
 test("keeps the ballot closed outside the official voting window", () => {
   assert.equal(desiredJotformVotingStatus(new Date("2026-08-27T09:59:59.999Z")), "Disabled");
   assert.equal(desiredJotformVotingStatus(new Date("2026-08-27T10:00:00.000Z")), "Enabled");

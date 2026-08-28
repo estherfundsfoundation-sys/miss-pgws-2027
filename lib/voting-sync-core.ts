@@ -64,6 +64,46 @@ function addVote(target: Map<number, number>, number: number, quantity: number) 
   target.set(number, (target.get(number) || 0) + quantity);
 }
 
+function parsedJsonRecord(value: unknown) {
+  if (typeof value !== "string") return asRecord(value);
+  try { return asRecord(JSON.parse(value)); } catch { return null; }
+}
+
+function jotformStripePayment(submission: JotformSubmission, pricePerVoteCents: number) {
+  for (const answer of Object.values(submission.answers || {})) {
+    const answerRecord = asRecord(answer);
+    if (!answerRecord || !/stripe|payment/i.test(String(answerRecord.type || ""))) continue;
+    const answerValue = asRecord(answerRecord.answer);
+    const payment = parsedJsonRecord(answerValue?.paymentArray);
+    if (!payment) continue;
+
+    const order = asRecord(payment.order);
+    const stripeData = asRecord(payment.stripeData);
+    const paid = /PAID|APPROVED|CAPTURED|COMPLETED|SUCCESS/i.test(String(order?.status || "")) || stripeData?.isCharged === true;
+    const transactionId = String(payment.transactionid || payment.transactionId || order?.id || "").trim();
+    const totalCents = currencyToCents(payment.total);
+    const productText = Array.isArray(payment.product) ? payment.product.join(" ") : String(payment.product || "");
+    const numbers = [...productText.matchAll(/contestant\s*#?\s*(\d{1,3})/gi)]
+      .map((match) => Number.parseInt(match[1], 10))
+      .filter((number, index, all) => number >= 1 && number <= 999 && all.indexOf(number) === index);
+
+    if (!paid) return { eligible: false, reason: "payment-not-confirmed", transactionId: null, totalCents, votesByContestantNumber: new Map<number, number>() };
+    if (!transactionId) return { eligible: false, reason: "missing-transaction-id", transactionId: null, totalCents, votesByContestantNumber: new Map<number, number>() };
+    if (numbers.length !== 1) return { eligible: false, reason: "missing-product-quantity", transactionId, totalCents, votesByContestantNumber: new Map<number, number>() };
+    if (totalCents == null || totalCents <= 0 || totalCents % pricePerVoteCents !== 0) {
+      return { eligible: false, reason: "amount-mismatch", transactionId, totalCents, votesByContestantNumber: new Map<number, number>() };
+    }
+    return {
+      eligible: true,
+      reason: "verified",
+      transactionId,
+      totalCents,
+      votesByContestantNumber: new Map([[numbers[0], totalCents / pricePerVoteCents]]),
+    };
+  }
+  return null;
+}
+
 function hasExplicitQuantity(value: unknown, visited = new Set<object>()): boolean {
   if (Array.isArray(value)) {
     if (visited.has(value)) return false;
@@ -207,6 +247,10 @@ export function parseVoteSubmission(submission: JotformSubmission, pricePerVoteC
   if (statuses.some((status) => INELIGIBLE_STATUS_PATTERN.test(status))) {
     return { eligible: false, reason: "ineligible-payment-status", transactionId: null, totalCents: extractTotalCents([submission, ...payments]), votesByContestantNumber: new Map() };
   }
+
+
+  const jotformPayment = jotformStripePayment(submission, pricePerVoteCents);
+  if (jotformPayment) return jotformPayment;
 
   const explicitTransactionId = extractTransactionId(submission, payments);
   const activeJotformPayment = statuses.length === 0 && /^ACTIVE$/i.test(String(submission.status || "")) && Boolean(submission.id);
