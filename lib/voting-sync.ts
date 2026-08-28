@@ -5,6 +5,20 @@ type ContestantRow = { id: string; contestant_number: number | null; public_name
 
 const DEFAULT_FORM_ID = "262258169740160";
 const PRICE_PER_VOTE_CENTS = 250;
+const AUTHORITATIVE_PRODUCT_SNAPSHOT_AT = Date.parse("2026-08-27T20:39:58-04:00");
+const AUTHORITATIVE_PRODUCT_SNAPSHOT = new Map<number, number>([
+  [49, 222], [120, 115], [16, 93], [29, 58], [73, 39], [70, 35], [116, 33], [114, 31],
+  [2, 17], [82, 16], [30, 16], [109, 11], [71, 11], [103, 11], [19, 10], [50, 6],
+  [92, 5], [91, 5], [3, 5], [140, 4], [143, 3], [61, 2], [142, 2], [33, 2], [25, 1],
+  [10, 1], [11, 1], [51, 1], [46, 1],
+]);
+
+function submissionTime(value: unknown) {
+  const raw = String(value || "").trim();
+  if (!raw) return Number.NaN;
+  const normalized = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(raw) ? `${raw.replace(" ", "T")}-04:00` : raw;
+  return Date.parse(normalized);
+}
 
 function databaseConfig() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
@@ -216,7 +230,11 @@ function rankedRows(contestants: ContestantRow[], votes: Map<number, number>, sy
 export async function syncVerifiedVotes({ dryRun = false }: { dryRun?: boolean } = {}) {
   const [submissions, contestants, ballotConfiguration] = await Promise.all([fetchVotingSubmissions(), contestantRows(), fetchVotingBallotConfiguration()]);
   if (!contestants.length) throw new Error("No numbered contestants are available for voting synchronization.");
-  const aggregation = aggregateVerifiedVotes(submissions, PRICE_PER_VOTE_CENTS);
+  const postSnapshotSubmissions = submissions.filter((submission) => submissionTime(submission.created_at) > AUTHORITATIVE_PRODUCT_SNAPSHOT_AT);
+  const aggregation = aggregateVerifiedVotes(postSnapshotSubmissions, PRICE_PER_VOTE_CENTS);
+  for (const [number, votes] of AUTHORITATIVE_PRODUCT_SNAPSHOT) {
+    aggregation.votesByContestantNumber.set(number, (aggregation.votesByContestantNumber.get(number) || 0) + votes);
+  }
   const knownNumbers = new Set(contestants.map((row) => Number(row.contestant_number)));
   const ballotNumbers = new Set<number>();
   for (const match of ballotConfiguration.matchAll(/\bContestant\s*#?\s*(\d{1,3})\b/gi)) ballotNumbers.add(Number(match[1]));
@@ -255,6 +273,8 @@ export async function syncVerifiedVotes({ dryRun = false }: { dryRun?: boolean }
     unexpectedBallotContestantNumbers,
     ballotConfigurationSamples,
     submissionCount: submissions.length,
+    postSnapshotSubmissionCount: postSnapshotSubmissions.length,
+    authoritativeSnapshotVotes: [...AUTHORITATIVE_PRODUCT_SNAPSHOT.values()].reduce((sum, votes) => sum + votes, 0),
     verifiedSubmissions: aggregation.verifiedSubmissions,
     ignoredSubmissions: aggregation.ignoredSubmissions,
     duplicateTransactions: aggregation.duplicateTransactions,
@@ -270,7 +290,7 @@ export async function syncVerifiedVotes({ dryRun = false }: { dryRun?: boolean }
 
 export async function getVotingLeaderboard() {
   const [contestants, totals, settings] = await Promise.all([
-    databaseFetch("pgws_contestants?contestant_number=not.is.null&public_profile_status=eq.published&select=id,public_slug,public_name,college,contestant_number,headshot_public_path,public_profile_status,pgws_applications!inner(status)&pgws_applications.status=eq.accepted&order=contestant_number.asc"),
+    databaseFetch("pgws_contestants?contestant_number=not.is.null&select=id,public_slug,public_name,college,contestant_number,headshot_public_path,public_profile_status,pgws_applications!inner(status)&pgws_applications.status=eq.accepted&order=contestant_number.asc"),
     databaseFetch("pgws_vote_totals?select=contestant_id,verified_votes,verified_amount_cents,provisional_rank,last_synced_at,audit_status&order=verified_votes.desc"),
     databaseFetch("pgws_platform_settings?singleton=eq.true&select=voting_open&limit=1"),
   ]) as [Row[], Row[], Row[]];
