@@ -26,7 +26,13 @@ const AUTHORITATIVE_PRODUCT_SNAPSHOT = new Map<number, number>([
 function submissionTime(value: unknown) {
   const raw = String(value || "").trim();
   if (!raw) return Number.NaN;
-  const normalized = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(raw) ? `${raw.replace(" ", "T")}Z` : raw;
+  // Jotform returns naive submission timestamps in the account timezone.
+  // Voting is administered in America/New_York, so treating those values as
+  // UTC moves each payment four hours backward and can place valid votes on
+  // the wrong side of the audited snapshot cutoff.
+  const normalized = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(raw)
+    ? `${raw.replace(" ", "T")}-04:00`
+    : raw;
   return Date.parse(normalized);
 }
 
