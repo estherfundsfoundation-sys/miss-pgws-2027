@@ -18,9 +18,9 @@ export const campaignDates = [
   ["Contestant announcement graphic", "August 26, 2026 · 10:00 AM ET"],
   ["Official campaign video post", "August 27, 2026 · 10:00 AM ET"],
   ["Voting opens", "August 27, 2026 · 6:00 AM ET"],
-  ["Campaign week", "August 27–September 3, 2026"],
-  ["Voting closes", "September 3, 2026 · 11:59 PM ET"],
-  ["Final verification and winners announced", "September 4, 2026"],
+  ["Campaign week", "August 27–September 4, 2026"],
+  ["Voting closes", "September 4, 2026 · 11:59 PM ET"],
+  ["Final verification and winners announced", "September 5, 2026"],
 ] as const;
 
 export const campaignGuideDownload = "/downloads/PGWS_New_Beauty_Issue_Contestant_Campaign_Guide.pdf";

@@ -119,7 +119,7 @@ const milestones: Milestone[] = [
   {
     id: "voting-closes",
     number: "07",
-    date: "SEPTEMBER 3",
+    date: "SEPTEMBER 4",
     time: "11:59 PM ET",
     owner: "EVERYONE",
     title: "Voting closes",
@@ -134,7 +134,7 @@ const milestones: Milestone[] = [
   {
     id: "winners",
     number: "08",
-    date: "SEPTEMBER 4",
+    date: "SEPTEMBER 5",
     owner: "FOUNDATION",
     title: "Final verification and winners announced",
     summary: "The Foundation verifies eligible payments and final results before announcing the 2027 titleholders.",
@@ -150,7 +150,7 @@ const countdownEvents = [
   { label: "your announcement post", at: "2026-08-26T10:00:00-04:00" },
   { label: "your campaign video post", at: "2026-08-27T10:00:00-04:00" },
   { label: "voting opening", at: "2026-08-27T06:00:00-04:00" },
-  { label: "voting closing", at: "2026-09-03T23:59:00-04:00" },
+  { label: "voting closing", at: "2026-09-04T23:59:00-04:00" },
 ];
 
 const campaignDays = [
@@ -161,7 +161,8 @@ const campaignDays = [
   ["AUG 31", "Campus and community day", "Reach your university, department, student organizations, alumni, church, and local community."],
   ["SEP 1", "Show the impact", "Explain how EFF scholarships and student support help women remain enrolled and keep moving toward graduation."],
   ["SEP 2", "Forty-eight-hour rally", "Use a countdown, supporter testimonials, a Live, or a team challenge. Make the next action unmistakably clear."],
-  ["SEP 3", "Finish with gratitude", "Share final reminders without pressure, thank everyone publicly, and close your campaign with grace."],
+  ["SEP 3", "Extend your reach", "Thank supporters, share a clear progress update, and invite one more campus or community circle into your campaign."],
+  ["SEP 4", "Finish with gratitude", "Share final reminders without pressure, thank everyone publicly, and close your campaign with grace."],
 ];
 
 const campaignIdeas = [
