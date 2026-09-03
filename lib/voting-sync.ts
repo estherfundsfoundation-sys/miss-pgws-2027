@@ -21,6 +21,11 @@ const NATIONALS_EMAIL = "nationals@estherfundsinc.org";
 const EXCLUDED_TRANSACTION_IDS = new Set([
   "pi_3U9vGJCVeGfbLRqu0Qe6paUo", // 100 votes for contestant 073
 ]);
+
+function containsExcludedTransaction(submission: JotformSubmission) {
+  const serialized = JSON.stringify(submission);
+  return [...EXCLUDED_TRANSACTION_IDS].some((transactionId) => serialized.includes(transactionId));
+}
 const AUTHORITATIVE_PRODUCT_SNAPSHOT = new Map<number, number>([
   [2, 69], [3, 6], [4, 4], [6, 14], [10, 1], [11, 1], [16, 160], [19, 10], [25, 43],
   [29, 89], [30, 28], [33, 2], [35, 6], [46, 1], [49, 299], [50, 38], [51, 1], [61, 12],
@@ -236,7 +241,7 @@ async function sendSupporterAlerts(submissions: JotformSubmission[], contestants
   const resendKey = process.env.RESEND_API_KEY?.trim();
   if (!resendKey) return { supporterAlertsSent: 0, supporterAlertsSkipped: 0, supporterAlertsFailed: 0 };
   const eligible = submissions.map((submission) => ({ submission, parsed: parseVoteSubmission(submission, PRICE_PER_VOTE_CENTS) }))
-    .filter(({ submission, parsed }) => submissionTime(submission.created_at) >= SUPPORTER_ALERTS_BEGIN_AT && parsed.eligible && parsed.transactionId && !EXCLUDED_TRANSACTION_IDS.has(parsed.transactionId) && parsed.votesByContestantNumber.size === 1);
+    .filter(({ submission, parsed }) => submissionTime(submission.created_at) >= SUPPORTER_ALERTS_BEGIN_AT && parsed.eligible && parsed.transactionId && !containsExcludedTransaction(submission) && !EXCLUDED_TRANSACTION_IDS.has(parsed.transactionId) && parsed.votesByContestantNumber.size === 1);
   if (!eligible.length) return { supporterAlertsSent: 0, supporterAlertsSkipped: 0, supporterAlertsFailed: 0 };
 
   const audits = await databaseFetch(`pgws_audit_log?action=eq.${SUPPORTER_ALERT_ACTION}&select=entity_id&limit=5000`) as Array<{ entity_id: string }>;
@@ -323,6 +328,7 @@ export async function syncVerifiedVotes({ dryRun = false }: { dryRun?: boolean }
   if (!contestants.length) throw new Error("No numbered contestants are available for voting synchronization.");
   const postSnapshotSubmissions = submissions.filter((submission) => {
     if (submissionTime(submission.created_at) <= AUTHORITATIVE_PRODUCT_SNAPSHOT_AT) return false;
+    if (containsExcludedTransaction(submission)) return false;
     const transactionId = parseVoteSubmission(submission, PRICE_PER_VOTE_CENTS).transactionId;
     return !transactionId || !EXCLUDED_TRANSACTION_IDS.has(transactionId);
   });
